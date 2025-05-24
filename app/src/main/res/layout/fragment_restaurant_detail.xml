@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
+
+    <!-- 툴바 -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/restaurant_detail_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent">
+
+    <TextView
+        android:id="@+id/restaurant_detail_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="엄용백 돼지 국밥"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="25sp"
+        android:layout_gravity="center"/>
+
+    <ImageView
+        android:id="@+id/back_button_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_backbutton"
+        android:background="@color/white"/>
+
+        <TextView
+            android:id="@+id/mypage_edit_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="★ 4.0"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:layout_marginEnd="30dp"
+            android:layout_gravity="end"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        app:layout_constraintGuide_percent="0.07" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        app:layout_constraintGuide_percent="0.93" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <TextView
+        android:id="@+id/restaurant_address_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="용산구"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline1"
+        app:layout_constraintTop_toBottomOf="@+id/restaurant_detail_toolbar"/>
+
+    <TextView
+        android:id="@+id/restaurant_type_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="한식"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@id/guideline1"
+        app:layout_constraintTop_toBottomOf="@+id/restaurant_address_tv"/>
+
+    <TextView
+        android:id="@+id/review_summation_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="깔끔하고 맛있는 국밥과 매력적인 인테리어"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline1"
+        app:layout_constraintEnd_toEndOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/restaurant_type_tv"/>
+
+    <ImageView
+        android:id="@+id/restaurant_image1_iv"
+        android:layout_width="140dp"
+        android:layout_height="130dp"
+        android:src="@drawable/img1"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="30dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline1"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"/>
+
+    <ImageView
+        android:id="@+id/restaurant_image2_iv"
+        android:layout_width="150dp"
+        android:layout_height="130dp"
+        android:src="@drawable/img2"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintEnd_toEndOf="@+id/guideline2"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"/>
+
+    <View
+        android:id="@+id/line1_v"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@color/light_gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline3"/>
+
+    <TextView
+        android:id="@+id/naver_star_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="네이버 ★ 4.5"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="45dp"
+        app:layout_constraintStart_toStartOf="@id/guideline1"
+        app:layout_constraintEnd_toEndOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/guideline3"/>
+
+    <TextView
+        android:id="@+id/kakao_star_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="카카오 ★ 3.5"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintStart_toStartOf="@id/guideline1"
+        app:layout_constraintEnd_toEndOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/naver_star_tv"/>
+
+    <TextView
+        android:id="@+id/total_review_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="총 리뷰 300"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="60dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="@id/guideline2"
+        app:layout_constraintTop_toBottomOf="@id/guideline3"/>
+
+    <android.widget.Button
+        android:id="@+id/naver_review_bt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="네이버 리뷰 보기"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:background="@drawable/review_buttion_custom"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@id/guideline1"
+        app:layout_constraintEnd_toEndOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/kakao_star_tv"/>
+
+    <android.widget.Button
+        android:id="@+id/kakao_review_bt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="카카오 리뷰 보기"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:background="@drawable/review_buttion_custom"
+        app:layout_constraintStart_toStartOf="@id/guideline4"
+        app:layout_constraintEnd_toEndOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/naver_review_bt"
+        app:layout_constraintBottom_toBottomOf="@+id/naver_review_bt"/>
+
+    <View
+        android:id="@+id/line2_v"
+        android:layout_width="2dp"
+        android:layout_height="100dp"
+        android:background="@color/light_gray"
+        android:layout_marginTop="50dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/guideline3"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
