@@ -19,20 +19,20 @@ class RestaurantDetailFragment: Fragment() {
         binding = FragmentRestaurantDetailBinding.inflate(inflater, container, false)
 
         // 네이버 리뷰 버튼 클릭 시
-        binding.naverReviewBt.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, RestaurantDetailNaverFragment())
-                .addToBackStack(null)
-                .commitAllowingStateLoss()
-        }
-
-        // 카카오 리뷰 버튼 클릭 시
-        binding.kakaoReviewBt.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, RestaurantDetailKakaoFragment())
-                .addToBackStack(null)
-                .commitAllowingStateLoss()
-        }
+//        binding.naverReviewBt.setOnClickListener {
+//            parentFragmentManager.beginTransaction()
+//                .replace(R.id.fragmentContainer, RestaurantDetailNaverFragment())
+//                .addToBackStack(null)
+//                .commitAllowingStateLoss()
+//        }
+//
+//        // 카카오 리뷰 버튼 클릭 시
+//        binding.kakaoReviewBt.setOnClickListener {
+//            parentFragmentManager.beginTransaction()
+//                .replace(R.id.fragmentContainer, RestaurantDetailKakaoFragment())
+//                .addToBackStack(null)
+//                .commitAllowingStateLoss()
+//        }
 
         return binding.root
     }
