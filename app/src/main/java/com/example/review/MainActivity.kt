@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var mainGoogleMap: GoogleMap
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private var selectedRestaurant: Restaurant? = null
 
     data class Restaurant(val name: String, val desc: String, val lat: Double, val lng: Double)
 
@@ -29,29 +30,34 @@ class MainActivity : AppCompatActivity() {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN // 처음엔 숨김!
 
-        // 식당 데이터 준비 (위치는 필요시 미세조정)
-        val restaurants = listOf(
-            Restaurant("송추가마골 인어반 광화문점", "한국식 BBQ", 37.5725, 126.9789),
-            Restaurant("박순례 손말이고기 산정집 광화문점", "한식/고기", 37.5730, 126.9814),
-            Restaurant("족발야시장&무청감자탕 광화문점", "족발/감자탕", 37.5717, 126.9768),
-            Restaurant("오가와", "초밥/일식", 37.5724, 126.9826)
-        )
+        // 지도 fragment를 add할 때, 인스턴스를 변수에 저장
+        val mapFragment: SupportMapFragment
+        if (savedInstanceState == null) {
+            mapFragment = SupportMapFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container, mapFragment, "map")
+                .commit()
+        } else {
+            mapFragment = supportFragmentManager.findFragmentByTag("map") as SupportMapFragment
+        }
 
-        // 지도 준비
-        val supportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        supportMapFragment.getMapAsync { map -> // 구글 지도 사용 준비 완료 시 반응하는 리스너 등록
-
-            // 구글맵 객체 변수에 담아 사용
+        // SupportMapFragment 얻어서 getMapAsync 등록
+        mapFragment.getMapAsync { map ->
             mainGoogleMap = map
-
-            // 지도의 옵션 설정
-            map.uiSettings.isZoomControlsEnabled = true // 확대 축소 기능
-            map.uiSettings.isMyLocationButtonEnabled = false // 현재 위치 표시하는 버튼 표시 여부
+            map.uiSettings.isZoomControlsEnabled = true
+            map.uiSettings.isMyLocationButtonEnabled = false
 
             // 종로구 카메라 초기 위치
             val jongnoLatLng = LatLng(37.572950, 126.979357)
-            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(jongnoLatLng, 15f)
-            mainGoogleMap.moveCamera(cameraUpdate)
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(jongnoLatLng, 15f))
+
+            // 식당 데이터 (임시)
+            val restaurants = listOf(
+                Restaurant("송추가마골 인어반 광화문점", "한국식 BBQ", 37.5725, 126.9789),
+                Restaurant("박순례 손말이고기 산정집 광화문점", "한식/고기", 37.5730, 126.9814),
+                Restaurant("족발야시장&무청감자탕 광화문점", "족발/감자탕", 37.5717, 126.9768),
+                Restaurant("오가와", "초밥/일식", 37.5724, 126.9826)
+            )
 
             // 마커와 식당 연결
             val markerRestaurantMap = mutableMapOf<Marker, Restaurant>()
@@ -66,14 +72,29 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            // 마커 클릭 리스너
+            // 마커 클릭 시
             map.setOnMarkerClickListener { marker ->
                 markerRestaurantMap[marker]?.let { restaurant ->
                     binding.tvRestaurantName.text = restaurant.name
                     binding.tvRestaurantDesc.text = restaurant.desc
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    selectedRestaurant = restaurant   // 클릭된 식당 저장
                 }
                 true
+            }
+        }
+
+        // 바텀시트 클릭 시 상세화면
+        binding.bottomSheet.setOnClickListener {
+            selectedRestaurant?.let { restaurant ->
+                val fragment = RestaurantDetailFragment.newInstance(restaurant.name, restaurant.desc)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment) // 반드시 fragment_container!
+                    .addToBackStack(null)
+                    .commit()
+
+                // 바텀시트 숨기기
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
     }
