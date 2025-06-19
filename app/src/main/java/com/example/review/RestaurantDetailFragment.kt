@@ -56,11 +56,11 @@ class RestaurantDetailFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val name = arguments?.getString(ARG_NAME)
-        val desc = arguments?.getString(ARG_DESC)
+        //val desc = arguments?.getString(ARG_DESC)
 
         // 바인딩해서 각 뷰에 세팅
         binding.restaurantDetailTitleTv.text = name ?: "이름없음"
-        binding.reviewSummationTv.text = desc ?: ""
+        //binding.reviewSummationTv.text = desc ?: ""
 
         // 백버튼 클릭 시
         binding.backButtonIv.setOnClickListener {
