@@ -16,7 +16,7 @@
     <LinearLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="160dp"
         android:orientation="vertical"
         android:background="@android:color/white"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
@@ -41,7 +41,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:text="설명"
+            android:text="★4.3 / 총 리뷰 300"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:id="@+id/review_summation_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="깔끔하고 맛있는 국밥과 매력적인 인테리어"
             android:textSize="15sp"/>
 
     </LinearLayout>
