@@ -32,22 +32,25 @@ class NaverReviewRVAdapter(private val naverReviewList: ArrayList<Naver_review>)
             binding.textReview.text = naver_review.content
 
             // 이미지 처리
-            val imageUrls = naver_review.imageUrls
-            if (imageUrls.isNotEmpty()){ // 이미지가 비어있지 않으면
+            if(naver_review.image1 != null && naver_review.image2 != null){
                 binding.imageContainer.visibility = View.VISIBLE
+                binding.image1.visibility = View.VISIBLE
+                binding.image2.visibility = View.VISIBLE
 
                 Glide.with(binding.image1.context)
-                    .load(imageUrls[0])
+                    .load(naver_review.image1)
                     .into(binding.image1)
+                Glide.with(binding.image2.context)
+                    .load(naver_review.image2)
+                    .into(binding.image2)
+            } else if(naver_review.image1 != null && naver_review.image2 == null){
+                binding.imageContainer.visibility = View.VISIBLE
+                binding.image1.visibility = View.VISIBLE
+                binding.image2.visibility = View.GONE
 
-                if (imageUrls.size > 1) {
-                    binding.image2.visibility = View.VISIBLE
-                    Glide.with(binding.image2.context)
-                        .load(imageUrls[1])
-                        .into(binding.image2)
-                } else {
-                    binding.image2.visibility = View.GONE
-                }
+                Glide.with(binding.image1.context)
+                    .load(naver_review.image1)
+                    .into(binding.image1)
             } else {
                 binding.imageContainer.visibility = View.GONE
             }
