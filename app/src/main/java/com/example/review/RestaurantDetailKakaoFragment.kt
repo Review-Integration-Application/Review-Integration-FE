@@ -24,9 +24,21 @@ class RestaurantDetailKakaoFragment: Fragment() {
 
         // 더미 데이터 (API 받기 전)
         kakaoReviewDatas.apply {
-            add(Kakao_review(5f, "2025.02.12", "정말 맛있어요!", listOf("https://example.com/image1.jpg", "https://example.com/image2.jpg")))
-            add(Kakao_review(3f, "2025.01.30", "그냥 그랬어요.", emptyList()))
-            add(Kakao_review(2f, "2025.01.03", "별로였어요.", emptyList()))
+            add(Kakao_review(5f, "2025.02.12", "정말 맛있어요!", R.drawable.img1, R.drawable.img2))
+            add(Kakao_review(3f, "2025.01.30", "그냥 그랬어요."))
+            add(Kakao_review(2f, "2025.01.03", "별로였어요."))
+            add(Kakao_review(4f, "2025.01.08", "맛있게 잘 먹었습니다."))
+            add(Kakao_review(5f, "2025.03.03", "예약없이 바로 들어갔어요! 잘 먹었습니다 :)"))
+            add(Kakao_review(5f, "2025.03.12", "종로구 최고 맛집!"))
+            add(Kakao_review(4f, "2025.03.16", "주말에는 웨이팅이 조금 있어요! 맛은 아주 맛있습니당"))
+            add(Kakao_review(5f, "2025.03.16", "주말이라 한 20분정도 웨이팅 있었습니다! 맛있네요!"))
+            add(Kakao_review(3f, "2025.04.03", "살짝 간이 싱거웠어요 ㅜㅜ"))
+            add(Kakao_review(5f, "2025.04.12", "인테이러가 너무 이뻐요!"))
+            add(Kakao_review(4f, "2025.05.01", "종종 먹으러 갈 것 같아요! 좋아요!"))
+            add(Kakao_review(5f, "2025.05.03", "맛집 인정!"))
+            add(Kakao_review(5f, "2025.05.13", "너무 맛있어요~"))
+            add(Kakao_review(5f, "2025.05.14", "저번에 먹었는데 맛있어서 또 왔습니다~ 잘 먹었어요!"))
+            add(Kakao_review(4f, "2025.05.20", "굿! 배부르게 잘 먹었습니다"))
         }
 
         // 어댑터와 더미데이터 연결
