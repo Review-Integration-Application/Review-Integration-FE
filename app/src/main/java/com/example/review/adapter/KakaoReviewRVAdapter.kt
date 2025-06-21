@@ -33,22 +33,25 @@ class KakaoReviewRVAdapter(private val kakaoReviewList: ArrayList<Kakao_review>)
             binding.textReview.text = kakao_review.content
 
             // 이미지 처리
-            val imageUrls = kakao_review.imageUrls
-            if (imageUrls.isNotEmpty()){ // 이미지가 비어있지 않으면
+            if(kakao_review.image1 != null && kakao_review.image2 != null){
                 binding.imageContainer.visibility = View.VISIBLE
+                binding.image1.visibility = View.VISIBLE
+                binding.image2.visibility = View.VISIBLE
 
                 Glide.with(binding.image1.context)
-                    .load(imageUrls[0])
+                    .load(kakao_review.image1)
                     .into(binding.image1)
+                Glide.with(binding.image2.context)
+                    .load(kakao_review.image2)
+                    .into(binding.image2)
+            } else if(kakao_review.image1 != null && kakao_review.image2 == null){
+                binding.imageContainer.visibility = View.VISIBLE
+                binding.image1.visibility = View.VISIBLE
+                binding.image2.visibility = View.GONE
 
-                if (imageUrls.size > 1) {
-                    binding.image2.visibility = View.VISIBLE
-                    Glide.with(binding.image2.context)
-                        .load(imageUrls[1])
-                        .into(binding.image2)
-                } else {
-                    binding.image2.visibility = View.GONE
-                }
+                Glide.with(binding.image1.context)
+                    .load(kakao_review.image1)
+                    .into(binding.image1)
             } else {
                 binding.imageContainer.visibility = View.GONE
             }
