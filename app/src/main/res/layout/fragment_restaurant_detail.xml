@@ -100,7 +100,7 @@
         android:id="@+id/review_summation_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="깔끔하고 맛있는 국밥과 매력적인 인테리어"
+        android:text="깔끔하고 맛있는 음식과 매력적인 인테리어"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/black"
