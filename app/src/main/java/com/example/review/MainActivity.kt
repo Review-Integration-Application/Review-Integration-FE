@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            // 마커 클릭 시
+            // 마커 클릭 시 바텀시트 등장
             map.setOnMarkerClickListener { marker ->
                 markerRestaurantMap[marker]?.let { restaurant ->
                     binding.tvRestaurantName.text = restaurant.name
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 바텀시트 클릭 시 상세화면
+        // 바텀시트 클릭 시 상세화면으로 이동
         binding.bottomSheet.setOnClickListener {
             selectedRestaurant?.let { restaurant ->
                 val fragment = RestaurantDetailFragment.newInstance(restaurant.name, restaurant.desc)
