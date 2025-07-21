@@ -1,8 +1,12 @@
 package com.example.review
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.example.review.api.Response.RestaurantResponse
+import com.example.review.api.RestoreItf
+import com.example.review.api.RetrofitBaseObj
 import com.example.review.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -11,15 +15,18 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
     private lateinit var mainGoogleMap: GoogleMap
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
-    private var selectedRestaurant: Restaurant? = null
+    private var selectedRestaurant: RestaurantResponse? = null
 
-    data class Restaurant(val name: String, val desc: String, val lat: Double, val lng: Double)
+    //data class Restaurant(val name: String, val desc: String, val lat: Double, val lng: Double)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,50 +59,72 @@ class MainActivity : AppCompatActivity() {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(jongnoLatLng, 15f))
 
             // 식당 데이터 (임시)
-            val restaurants = listOf(
-                Restaurant("송추가마골 인어반 광화문점", "★4.3 / 총 리뷰 300", 37.5725, 126.9789),
-                Restaurant("박순례 손말이고기 산정집 광화문점", "★4.0 / 총 리뷰 250", 37.5730, 126.9814),
-                Restaurant("족발야시장&무청감자탕 광화문점", "★4.4 / 총 리뷰 270", 37.5717, 126.9768),
-                Restaurant("오가와", "★4.2 / 총 리뷰 280", 37.5724, 126.9826)
-            )
+//            val restaurants = listOf(
+//                Restaurant("송추가마골 인어반 광화문점", "★4.3 / 총 리뷰 300", 37.5725, 126.9789),
+//                Restaurant("박순례 손말이고기 산정집 광화문점", "★4.0 / 총 리뷰 250", 37.5730, 126.9814),
+//                Restaurant("족발야시장&무청감자탕 광화문점", "★4.4 / 총 리뷰 270", 37.5717, 126.9768),
+//                Restaurant("오가와", "★4.2 / 총 리뷰 280", 37.5724, 126.9826)
+//            )
 
             // 마커와 식당 연결
-            val markerRestaurantMap = mutableMapOf<Marker, Restaurant>()
-            for (restaurant in restaurants) {
-                val marker = map.addMarker(
-                    MarkerOptions()
-                        .position(LatLng(restaurant.lat, restaurant.lng))
-                        .title(restaurant.name)
-                )
-                marker?.let {
-                    markerRestaurantMap[it] = restaurant
-                }
-            }
+            val markerRestaurantMap = mutableMapOf<Marker, RestaurantResponse>()
 
-            // 마커 클릭 시 바텀시트 등장
+            // 식당 조회 API
+            val restoreService = RetrofitBaseObj.getRetrofit().create(RestoreItf::class.java)
+            restoreService.getRestaurants().enqueue(object: Callback<List<RestaurantResponse>>{
+                override fun onResponse(
+                    call: Call<List<RestaurantResponse>>,
+                    response: Response<List<RestaurantResponse>>
+                ) {
+                    if (response.isSuccessful) {
+                        val restaurants = response.body() ?: emptyList()
+                        runOnUiThread {
+                            for (restaurant in restaurants) {
+                                val marker = map.addMarker(
+                                    MarkerOptions()
+                                        .position(LatLng(restaurant.lat, restaurant.lng))
+                                        .title(restaurant.restore_name)
+                                )
+                                marker?.let {
+                                    markerRestaurantMap[it] = restaurant
+                                }
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<List<RestaurantResponse>>, t: Throwable) {
+                    Log.d("RETROFIT/FAILURE", t.printStackTrace().toString())
+                }
+
+            })
+
+            // 마커 클릭 시 바텀시트 등장 (RestaurantResponse 사용)
             map.setOnMarkerClickListener { marker ->
                 markerRestaurantMap[marker]?.let { restaurant ->
-                    binding.tvRestaurantName.text = restaurant.name
-                    binding.tvRestaurantDesc.text = restaurant.desc
+                    binding.tvRestaurantName.text = restaurant.restore_name
+                    binding.tvRestaurantDesc.text =
+                        "★${restaurant.restore_score} / 총 리뷰 ${restaurant.total_reviews_num}"
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    selectedRestaurant = restaurant   // 클릭된 식당 저장
+                    selectedRestaurant = restaurant
+                    // 클릭된 식당 저장 (Restaurant 타입)
                 }
                 true
             }
         }
 
-        // 바텀시트 클릭 시 상세화면으로 이동
-        binding.bottomSheet.setOnClickListener {
-            selectedRestaurant?.let { restaurant ->
-                val fragment = RestaurantDetailFragment.newInstance(restaurant.name, restaurant.desc)
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, fragment) // 반드시 fragment_container!
-                    .addToBackStack(null)
-                    .commit()
-
-                // 바텀시트 숨기기
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-        }
+//        // 바텀시트 클릭 시 상세화면으로 이동
+//        binding.bottomSheet.setOnClickListener {
+//            selectedRestaurant?.let { restaurant ->
+//                val fragment = RestaurantDetailFragment.newInstance(restaurant.name, restaurant.desc)
+//                supportFragmentManager.beginTransaction()
+//                    .replace(R.id.fragment_container, fragment) // 반드시 fragment_container!
+//                    .addToBackStack(null)
+//                    .commit()
+//
+//                // 바텀시트 숨기기
+//                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+//            }
+//        }
     }
 }
