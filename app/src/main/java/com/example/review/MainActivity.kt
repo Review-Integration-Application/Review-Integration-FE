@@ -113,18 +113,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-//        // 바텀시트 클릭 시 상세화면으로 이동
-//        binding.bottomSheet.setOnClickListener {
-//            selectedRestaurant?.let { restaurant ->
-//                val fragment = RestaurantDetailFragment.newInstance(restaurant.name, restaurant.desc)
-//                supportFragmentManager.beginTransaction()
-//                    .replace(R.id.fragment_container, fragment) // 반드시 fragment_container!
-//                    .addToBackStack(null)
-//                    .commit()
-//
-//                // 바텀시트 숨기기
-//                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-//            }
-//        }
+        // 바텀시트 클릭 시 상세화면으로 이동
+        binding.bottomSheet.setOnClickListener {
+            selectedRestaurant?.let { restaurant ->
+                val fragment = RestaurantDetailFragment.newInstance(restaurant.restore_ID)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment) // 반드시 fragment_container!
+                    .addToBackStack(null)
+                    .commit()
+
+                // 바텀시트 숨기기
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
     }
 }
