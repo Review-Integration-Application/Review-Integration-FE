@@ -1,23 +1,28 @@
 package com.example.review
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.review.api.Response.RestaurantDetailResponse
+import com.example.review.api.RestoreItf
+import com.example.review.api.RetrofitBaseObj
 import com.example.review.databinding.FragmentRestaurantDetailBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class RestaurantDetailFragment: Fragment() {
 
     companion object {
-        private const val ARG_NAME = "name"
-        private const val ARG_DESC = "desc"
+        private const val ARG_ID = "restore_id"
 
-        fun newInstance(name: String, desc: String): RestaurantDetailFragment {
+        fun newInstance(restoreId: Int): RestaurantDetailFragment {
             val fragment = RestaurantDetailFragment()
             val args = Bundle()
-            args.putString(ARG_NAME, name)
-            args.putString(ARG_DESC, desc)
+            args.putInt(ARG_ID, restoreId)
             fragment.arguments = args
             return fragment
         }
@@ -55,12 +60,38 @@ class RestaurantDetailFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val name = arguments?.getString(ARG_NAME)
-        //val desc = arguments?.getString(ARG_DESC)
+        val restoreId = arguments?.getInt(ARG_ID) ?: -1
+        if (restoreId == -1) {
+            binding.restaurantDetailTitleTv.text = "식당 정보 없음"
+            return
+        }
 
-        // 바인딩해서 각 뷰에 세팅
-        binding.restaurantDetailTitleTv.text = name ?: "이름없음"
-        //binding.reviewSummationTv.text = desc ?: ""
+        Log.d("식당 아이디", restoreId.toString())
+
+        // 식당 상세 조회 api
+        val restoreDetailService = RetrofitBaseObj.getRetrofit().create(RestoreItf::class.java)
+        restoreDetailService.getRestaurant(restoreId).enqueue(object:
+            Callback<RestaurantDetailResponse>{
+            override fun onResponse(
+                call: Call<RestaurantDetailResponse>,
+                response: Response<RestaurantDetailResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val detail = response.body()
+                    detail?.let {
+                        binding.restaurantDetailTitleTv.text = it.restore_name
+                        binding.restaurantTypeTv.text = it.category
+                        binding.totalReviewTv.text = "총 리뷰 ${it.total_reviews_num}"
+                        binding.reviewSummationTv.text = it.review_short ?: ""
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<RestaurantDetailResponse>, t: Throwable) {
+                binding.restaurantDetailTitleTv.text = "조회 실패"
+            }
+
+        })
 
         // 백버튼 클릭 시
         binding.backButtonIv.setOnClickListener {
