@@ -30,16 +30,6 @@
         android:src="@drawable/ic_backbutton"
         android:background="@color/white"/>
 
-        <TextView
-            android:id="@+id/mypage_edit_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="★ 4.0"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:layout_marginEnd="30dp"
-            android:layout_gravity="end"/>
-
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.constraintlayout.widget.Guideline
@@ -139,11 +129,11 @@
         app:layout_constraintTop_toTopOf="@+id/guideline3"/>
 
     <TextView
-        android:id="@+id/naver_star_tv"
+        android:id="@+id/naver_summation_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="네이버 ★ 4.5"
-        android:textSize="20sp"
+        android:text="네이버 리뷰 한 줄 요약"
+        android:textSize="18sp"
         android:textColor="@color/black"
         android:layout_marginTop="45dp"
         app:layout_constraintStart_toStartOf="@id/guideline1"
@@ -151,28 +141,40 @@
         app:layout_constraintTop_toBottomOf="@+id/guideline3"/>
 
     <TextView
-        android:id="@+id/kakao_star_tv"
+        android:id="@+id/naver_summation_detail_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="카카오 ★ 3.5"
+        android:text="(리뷰 내용)"
         android:textSize="20sp"
         android:textColor="@color/black"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintStart_toStartOf="@id/guideline1"
         app:layout_constraintEnd_toEndOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/naver_star_tv"/>
+        app:layout_constraintTop_toBottomOf="@+id/naver_summation_tv"/>
 
     <TextView
-        android:id="@+id/total_review_tv"
+        android:id="@+id/kakao_summation_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="총 리뷰 300"
-        android:textSize="20sp"
+        android:text="카카오 리뷰 한 줄 요약"
+        android:textSize="18sp"
         android:textColor="@color/black"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="45dp"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintTop_toBottomOf="@id/guideline3"/>
+
+    <TextView
+        android:id="@+id/kakao_summation_detail_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(리뷰 내용)"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="30dp"
+        app:layout_constraintStart_toStartOf="@id/guideline4"
+        app:layout_constraintEnd_toEndOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/kakao_summation_tv"/>
 
     <android.widget.Button
         android:id="@+id/naver_review_bt"
@@ -182,10 +184,10 @@
         android:textSize="18sp"
         android:textColor="@color/black"
         android:background="@drawable/review_buttion_custom"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintStart_toStartOf="@id/guideline1"
         app:layout_constraintEnd_toEndOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/kakao_star_tv"/>
+        app:layout_constraintTop_toBottomOf="@+id/naver_summation_detail_tv"/>
 
     <android.widget.Button
         android:id="@+id/kakao_review_bt"

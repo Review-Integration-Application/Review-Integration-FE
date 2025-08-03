@@ -41,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:text="★4.3 / 총 리뷰 300"
+            android:text="총 리뷰 300"
             android:textSize="15sp"/>
 
         <TextView
