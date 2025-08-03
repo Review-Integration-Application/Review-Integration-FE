@@ -23,10 +23,10 @@ class NaverReviewRVAdapter(private val naverReviewList: ArrayList<Naver_review>)
 
     inner class ViewHolder(val binding: ItemRestaurantDetailNaverBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(naver_review: Naver_review){
-            // ★ 별점 텍스트 설정
-            val fullStars = "★".repeat(naver_review.rating.toInt())
-            val emptyStars = "☆".repeat(5 - naver_review.rating.toInt())
-            binding.starTextView.text = fullStars + emptyStars
+//            // ★ 별점 텍스트 설정
+//            val fullStars = "★".repeat(naver_review.rating.toInt())
+//            val emptyStars = "☆".repeat(5 - naver_review.rating.toInt())
+//            binding.starTextView.text = fullStars + emptyStars
 
             binding.textDate.text = naver_review.date
             binding.textReview.text = naver_review.content

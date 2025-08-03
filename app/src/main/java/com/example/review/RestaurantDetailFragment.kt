@@ -81,7 +81,7 @@ class RestaurantDetailFragment: Fragment() {
                     detail?.let {
                         binding.restaurantDetailTitleTv.text = it.restore_name
                         binding.restaurantTypeTv.text = it.category
-                        binding.totalReviewTv.text = "총 리뷰 ${it.total_reviews_num}"
+                        //binding.totalReviewTv.text = "총 리뷰 ${it.total_reviews_num}"
                         binding.reviewSummationTv.text = it.review_short ?: ""
                     }
                 }

@@ -24,10 +24,10 @@ class KakaoReviewRVAdapter(private val kakaoReviewList: ArrayList<Kakao_review>)
 
     inner class ViewHolder(val binding: ItemRestaurantDetailKakaoBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(kakao_review: Kakao_review){
-            // ★ 별점 텍스트 설정
-            val fullStars = "★".repeat(kakao_review.rating.toInt())
-            val emptyStars = "☆".repeat(5 - kakao_review.rating.toInt())
-            binding.starTextView.text = fullStars + emptyStars
+//            // ★ 별점 텍스트 설정
+//            val fullStars = "★".repeat(kakao_review.rating.toInt())
+//            val emptyStars = "☆".repeat(5 - kakao_review.rating.toInt())
+//            binding.starTextView.text = fullStars + emptyStars
 
             binding.textDate.text = kakao_review.date
             binding.textReview.text = kakao_review.content
