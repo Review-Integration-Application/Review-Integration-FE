@@ -29,7 +29,7 @@
             android:value="2f54706174cb1cedb14367762b572bb0" />
 
         <activity
-            android:name=".login.LoginActivity"
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,6 +39,9 @@
         </activity>
         <activity
             android:name=".MainActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".login.LoginActivity"
             android:exported="false"/>
 
         <!-- 카카오 로그인, 인가코드를 받기 위한 액티비티 -->
