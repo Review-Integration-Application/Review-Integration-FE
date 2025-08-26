@@ -9,5 +9,6 @@ data class RestaurantResponse(
     var image: String?, // 이미지는 여러 개면 리스트로!
     var total_reviews_num: Int,
     var lat: Double,
-    var lng: Double
+    var lng: Double,
+    var location: String
 )
