@@ -6,6 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.review.api.Response.RestaurantDetailResponse
 import com.example.review.api.RestoreItf
 import com.example.review.api.RetrofitBaseObj
@@ -83,6 +86,41 @@ class RestaurantDetailFragment: Fragment() {
                         binding.restaurantTypeTv.text = it.category
                         //binding.totalReviewTv.text = "총 리뷰 ${it.total_reviews_num}"
                         binding.reviewSummationTv.text = it.review_short ?: ""
+
+                        // 이미지 적용
+                        val raw = detail.image?.trim()
+
+                        if (raw.isNullOrBlank()) {
+                            binding.restaurantImage1Iv.visibility = View.GONE
+                            binding.restaurantImage2Iv.visibility = View.GONE
+                        } else {
+                            // 콤마로 분리해 1~2장만 사용
+                            val urls = raw.split(",")
+                                .map { it.trim() }
+                                .filter { it.isNotEmpty() }
+
+                            // 1번 이미지 처리
+                            if (urls.isNotEmpty()) {
+                                binding.restaurantImage1Iv.visibility = View.VISIBLE
+                                Glide.with(this@RestaurantDetailFragment)
+                                    .load(urls[0])
+                                    .transform(CenterCrop(), RoundedCorners(16))
+                                    .into(binding.restaurantImage1Iv)
+                            } else {
+                                binding.restaurantImage1Iv.visibility = View.GONE
+                            }
+
+                            // 2번 이미지 처리 (있을 때만 보이기)
+                            if (urls.size >= 2) {
+                                binding.restaurantImage2Iv.visibility = View.VISIBLE
+                                Glide.with(this@RestaurantDetailFragment)
+                                    .load(urls[1])
+                                    .transform(CenterCrop(), RoundedCorners(16))
+                                    .into(binding.restaurantImage2Iv)
+                            } else {
+                                binding.restaurantImage2Iv.visibility = View.GONE
+                            }
+                        }
                     }
                 }
             }
