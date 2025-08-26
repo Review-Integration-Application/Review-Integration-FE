@@ -1,9 +1,11 @@
 package com.example.review
 
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.review.api.Response.RestaurantResponse
 import com.example.review.api.RestoreItf
 import com.example.review.api.RetrofitBaseObj
@@ -15,11 +17,29 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
+
+    private suspend fun geocodeAddress(addr: String): LatLng? = withContext(Dispatchers.IO) {
+        try {
+            val geocoder = Geocoder(this@MainActivity, Locale.KOREA)
+            // 필요하면 서울 범위 bias도 가능: getFromLocationName(addr, 1, 37.40,126.80, 37.70,127.20)
+            val list = geocoder.getFromLocationName(addr, 1)
+            if (!list.isNullOrEmpty()) LatLng(list[0].latitude, list[0].longitude) else null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun normalizeAddress(s: String): String =
+        s.replace("\n", " ").replace(Regex("\\(.*?\\)"), "").trim()
 
     lateinit var binding: ActivityMainBinding
     private lateinit var mainGoogleMap: GoogleMap
@@ -77,24 +97,61 @@ class MainActivity : AppCompatActivity() {
                     response: Response<List<RestaurantResponse>>
                 ) {
                     if (response.isSuccessful) {
-                        val restaurants = response.body() ?: emptyList()
-                        runOnUiThread {
+                        Log.d("서어어어어어어ㅓ엉ㅇ고오오오오옹", "성공성공")
+//                        val restaurants = response.body() ?: emptyList()
+//                        runOnUiThread {
+//                            for (restaurant in restaurants) {
+//                                val marker = map.addMarker(
+//                                    MarkerOptions()
+//                                        .position(LatLng(restaurant.lat, restaurant.lng))
+//                                        .title(restaurant.restore_name)
+//                                )
+//                                marker?.let {
+//                                    markerRestaurantMap[it] = restaurant
+//                                }
+//                            }
+//                        }
+                        val restaurants = response.body().orEmpty()
+
+                        lifecycleScope.launch {
                             for (restaurant in restaurants) {
-                                val marker = map.addMarker(
-                                    MarkerOptions()
-                                        .position(LatLng(restaurant.lat, restaurant.lng))
-                                        .title(restaurant.restore_name)
-                                )
-                                marker?.let {
-                                    markerRestaurantMap[it] = restaurant
+                                // 1) 위경도 이미 있으면 사용
+                                val hasLatLng = restaurant.lat != 0.0 && restaurant.lng != 0.0
+
+                                val pos: LatLng? = when {
+                                    hasLatLng -> LatLng(restaurant.lat, restaurant.lng)
+
+                                    // 2) 없으면 주소로 지오코딩 (address 필드명 맞게 수정)
+                                    !restaurant.location.isNullOrBlank() -> {
+                                        geocodeAddress(normalizeAddress(restaurant.location!!))
+                                    }
+
+                                    else -> null
                                 }
+
+                                pos?.let { latLng ->
+                                    val marker = map.addMarker(
+                                        MarkerOptions()
+                                            .position(latLng)
+                                            .title(restaurant.restore_name)
+                                    )
+                                    if (marker != null) {
+                                        markerRestaurantMap[marker] = restaurant
+                                    }
+                                }
+
+                                // 지오코딩 연속 호출시 살짝 텀(선택)
+                                // delay(120)
                             }
                         }
+
+                    } else {
+                        Log.e("API 응답 실패", "HTTP ${response.code()}  ${response.errorBody()?.string()}")
                     }
                 }
 
                 override fun onFailure(call: Call<List<RestaurantResponse>>, t: Throwable) {
-                    Log.d("RETROFIT/FAILURE", t.printStackTrace().toString())
+                    Log.e("API 연동 실패", "onFailure", t)
                 }
 
             })
