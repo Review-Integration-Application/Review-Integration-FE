@@ -99,25 +99,51 @@
         app:layout_constraintEnd_toEndOf="@+id/guideline2"
         app:layout_constraintTop_toBottomOf="@+id/restaurant_type_tv"/>
 
-    <ImageView
-        android:id="@+id/restaurant_image1_iv"
-        android:layout_width="140dp"
-        android:layout_height="130dp"
-        android:src="@drawable/img1"
-        android:layout_marginBottom="20dp"
-        android:layout_marginStart="30dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintBottom_toTopOf="@+id/guideline3"/>
+<!--    <ImageView-->
+<!--        android:id="@+id/restaurant_image1_iv"-->
+<!--        android:layout_width="140dp"-->
+<!--        android:layout_height="130dp"-->
+<!--        android:src="@drawable/img1"-->
+<!--        android:layout_marginBottom="20dp"-->
+<!--        android:layout_marginStart="30dp"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/guideline1"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/guideline3"/>-->
 
-    <ImageView
-        android:id="@+id/restaurant_image2_iv"
-        android:layout_width="150dp"
-        android:layout_height="130dp"
-        android:src="@drawable/img2"
-        android:layout_marginBottom="20dp"
-        android:layout_marginEnd="30dp"
+<!--    <ImageView-->
+<!--        android:id="@+id/restaurant_image2_iv"-->
+<!--        android:layout_width="150dp"-->
+<!--        android:layout_height="130dp"-->
+<!--        android:src="@drawable/img2"-->
+<!--        android:layout_marginBottom="20dp"-->
+<!--        android:layout_marginEnd="30dp"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/guideline2"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/guideline3"/>-->
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/image_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:tabIndicatorFullWidth="false"
+        app:tabSelectedTextColor="@color/black"
+        app:tabTextColor="@color/light_gray"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="@+id/guideline2"
-        app:layout_constraintBottom_toTopOf="@+id/guideline3"/>
+        app:layout_constraintStart_toStartOf="@+id/guideline1" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/restaurant_image_pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:overScrollMode="never"
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline1"
+        app:layout_constraintEnd_toEndOf="@+id/guideline2"
+        app:layout_constraintBottom_toTopOf="@id/image_indicator"
+        app:layout_constraintTop_toBottomOf="@+id/review_summation_tv" />
 
     <View
         android:id="@+id/line1_v"
