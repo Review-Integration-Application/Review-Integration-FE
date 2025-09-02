@@ -13,6 +13,6 @@ interface RestoreItf {
     fun getRestaurants(): Call<List<RestaurantResponse>>
 
     // 식당 상세 조회
-    @GET("restaurant/{restore_id}")
-    fun getRestaurant(@Path("restore_id") restoreId: Int): Call<RestaurantDetailResponse>
+    @GET("restaurant/{store_id}")
+    fun getRestaurant(@Path("store_id") storeId: Int): Call<RestaurantDetailResponse>
 }
