@@ -1,6 +1,7 @@
 package com.example.review
 
 import android.location.Geocoder
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
@@ -18,28 +19,77 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.Locale
+import kotlin.coroutines.resume
 
 class MainActivity : AppCompatActivity() {
 
-    private suspend fun geocodeAddress(addr: String): LatLng? = withContext(Dispatchers.IO) {
-        try {
-            val geocoder = Geocoder(this@MainActivity, Locale.KOREA)
-            // 필요하면 서울 범위 bias도 가능: getFromLocationName(addr, 1, 37.40,126.80, 37.70,127.20)
-            val list = geocoder.getFromLocationName(addr, 1)
-            if (!list.isNullOrEmpty()) LatLng(list[0].latitude, list[0].longitude) else null
-        } catch (_: Exception) {
+    private val addressCache = mutableMapOf<String, LatLng>()
+
+    private fun normalizeAddress(raw: String?): String {
+        if (raw.isNullOrBlank()) return ""
+        return raw
+            .replace("\n", " ")
+            .replace(Regex("\\(.*?\\)"), "") // 괄호 안 설명 제거
+            .replace(Regex("\\s+"), " ")
+            .trim()
+    }
+
+    // (선택) 서울 바운딩 박스
+    private val SEOUL_SOUTH = 37.40
+    private val SEOUL_WEST  = 126.80
+    private val SEOUL_NORTH = 37.70
+    private val SEOUL_EAST  = 127.20
+
+    private suspend fun geocodeAddressCompat(query: String): LatLng? {
+        if (query.isBlank()) return null
+
+        // 캐시 먼저 확인
+        addressCache[query]?.let { return it }
+
+        val geocoder = Geocoder(this, Locale.KOREA)
+
+        return try {
+            val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // API 33+: 콜백 기반
+                suspendCancellableCoroutine<LatLng?> { cont ->
+                    // 바운딩 박스 bias를 쓰고 싶다면 아래 주석 해제해서 사용:
+                    // geocoder.getFromLocationName(query, 1, SEOUL_SOUTH, SEOUL_WEST, SEOUL_NORTH, SEOUL_EAST, object : Geocoder.GeocodeListener { ... })
+
+                    geocoder.getFromLocationName(query, 1, object : Geocoder.GeocodeListener {
+                        override fun onGeocode(addresses: MutableList<android.location.Address>) {
+                            val p = addresses.firstOrNull()
+                            val latLng = p?.let { LatLng(it.latitude, it.longitude) }
+                            cont.resume(latLng)
+                        }
+                        override fun onError(errorMessage: String?) {
+                            cont.resume(null)
+                        }
+                    })
+                }
+            } else {
+                // API 32 이하: 동기식 → IO에서 실행
+                withContext(Dispatchers.IO) {
+                    // 바운딩 박스 bias 예시:
+                    // val list = geocoder.getFromLocationName(query, 1, SEOUL_SOUTH, SEOUL_WEST, SEOUL_NORTH, SEOUL_EAST)
+                    val list = geocoder.getFromLocationName(query, 1)
+                    val p = list?.firstOrNull()
+                    p?.let { LatLng(it.latitude, it.longitude) }
+                }
+            }
+
+            result?.also { addressCache[query] = it }
+        } catch (e: Exception) {
             null
         }
     }
-
-    private fun normalizeAddress(s: String): String =
-        s.replace("\n", " ").replace(Regex("\\(.*?\\)"), "").trim()
 
     lateinit var binding: ActivityMainBinding
     private lateinit var mainGoogleMap: GoogleMap
@@ -113,35 +163,25 @@ class MainActivity : AppCompatActivity() {
 //                        }
                         val restaurants = response.body().orEmpty()
 
+                        // 주소만으로 마커 찍기
                         lifecycleScope.launch {
                             for (restaurant in restaurants) {
-                                // 1) 위경도 이미 있으면 사용
-                                val hasLatLng = restaurant.lat != 0.0 && restaurant.lng != 0.0
+                                val addr = normalizeAddress(restaurant.address) // <- 실제 필드명 확인
 
-                                val pos: LatLng? = when {
-                                    hasLatLng -> LatLng(restaurant.lat, restaurant.lng)
-
-                                    // 2) 없으면 주소로 지오코딩 (address 필드명 맞게 수정)
-                                    !restaurant.location.isNullOrBlank() -> {
-                                        geocodeAddress(normalizeAddress(restaurant.location!!))
-                                    }
-
-                                    else -> null
-                                }
-
-                                pos?.let { latLng ->
+                                val pos = geocodeAddressCompat(addr)
+                                if (pos != null) {
                                     val marker = map.addMarker(
                                         MarkerOptions()
-                                            .position(latLng)
-                                            .title(restaurant.restore_name)
+                                            .position(pos)
+                                            .title(restaurant.store_name) // 타이틀로 매장명
                                     )
-                                    if (marker != null) {
-                                        markerRestaurantMap[marker] = restaurant
-                                    }
+                                    marker?.let { markerRestaurantMap[it] = restaurant }
+                                } else {
+                                    Log.w("Geocode", "주소 지오코딩 실패: $addr")
                                 }
 
-                                // 지오코딩 연속 호출시 살짝 텀(선택)
-                                // delay(120)
+                                // 연속 지오코딩 방지 (조절 가능)
+                                delay(120)
                             }
                         }
 
@@ -159,9 +199,8 @@ class MainActivity : AppCompatActivity() {
             // 마커 클릭 시 바텀시트 등장 (RestaurantResponse 사용)
             map.setOnMarkerClickListener { marker ->
                 markerRestaurantMap[marker]?.let { restaurant ->
-                    binding.tvRestaurantName.text = restaurant.restore_name
-                    binding.tvRestaurantDesc.text =
-                        "★${restaurant.restore_score} / 총 리뷰 ${restaurant.total_reviews_num}"
+                    binding.tvRestaurantName.text = restaurant.store_name
+                    binding.tvRestaurantDesc.text = "총 리뷰 ${restaurant.total_review_num}"
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                     selectedRestaurant = restaurant
                     // 클릭된 식당 저장 (Restaurant 타입)
@@ -173,7 +212,7 @@ class MainActivity : AppCompatActivity() {
         // 바텀시트 클릭 시 상세화면으로 이동
         binding.bottomSheet.setOnClickListener {
             selectedRestaurant?.let { restaurant ->
-                val fragment = RestaurantDetailFragment.newInstance(restaurant.restore_ID)
+                val fragment = RestaurantDetailFragment.newInstance(restaurant.store_id)
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, fragment) // 반드시 fragment_container!
                     .addToBackStack(null)
