@@ -56,8 +56,12 @@ class RestaurantDetailFragment: Fragment() {
 
         // 네이버 리뷰 버튼 클릭 시
         binding.naverReviewBt.setOnClickListener {
+            val storeId = arguments?.getInt(ARG_ID) ?: -1
             parentFragmentManager.beginTransaction()
-                .replace(R.id.main, RestaurantDetailNaverFragment())
+                .replace(
+                    R.id.main,
+                    RestaurantDetailNaverFragment.newInstance(storeId)  // ← storeId 전달
+                )
                 .addToBackStack(null)
                 .commitAllowingStateLoss()
         }
