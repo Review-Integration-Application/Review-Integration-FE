@@ -6,4 +6,7 @@
 
     <color name="mainColor">#F15C5C</color>
     <color name="subColor1">#F2D2D2</color>
+    <color name="naverColor">#AFED9B</color>
+    <color name="kakaoColor">#FFF0B7</color>
+
 </resources>
