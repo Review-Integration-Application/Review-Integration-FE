@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.example.review.api.Response.RestaurantResponse
 import com.example.review.api.RestoreItf
 import com.example.review.api.RetrofitBaseObj
@@ -93,7 +95,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
     private lateinit var mainGoogleMap: GoogleMap
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private var selectedRestaurant: RestaurantResponse? = null
 
     //data class Restaurant(val name: String, val desc: String, val lat: Double, val lng: Double)
@@ -201,6 +203,22 @@ class MainActivity : AppCompatActivity() {
                 markerRestaurantMap[marker]?.let { restaurant ->
                     binding.tvRestaurantName.text = restaurant.store_name
                     binding.tvRestaurantDesc.text = "총 리뷰 ${restaurant.total_review_num}"
+
+                    // 이미지 URL 적용
+                    restaurant.img_urls?.let { urls ->
+                        val firstUrl = urls.split(",").firstOrNull()?.trim()
+                        if (!firstUrl.isNullOrEmpty()) {
+                            Glide.with(this)
+                                .load(firstUrl)
+                                .centerCrop()
+                                .into(binding.reviewMainImageIv)
+                        } else {
+                            binding.reviewMainImageIv.setImageDrawable(null) // 빈 상태로
+                        }
+                    } ?: run {
+                        binding.reviewMainImageIv.setImageDrawable(null) // 빈 상태로
+                    }
+
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                     selectedRestaurant = restaurant
                     // 클릭된 식당 저장 (Restaurant 타입)
