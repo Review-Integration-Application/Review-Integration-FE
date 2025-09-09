@@ -203,6 +203,7 @@ class MainActivity : AppCompatActivity() {
                 markerRestaurantMap[marker]?.let { restaurant ->
                     binding.tvRestaurantName.text = restaurant.store_name
                     binding.tvRestaurantDesc.text = "총 리뷰 ${restaurant.total_review_num}"
+                    binding.reviewSummationTv.text = restaurant.review_summary
 
                     // 이미지 URL 적용
                     restaurant.img_urls?.let { urls ->
