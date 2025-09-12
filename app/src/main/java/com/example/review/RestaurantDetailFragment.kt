@@ -68,8 +68,12 @@ class RestaurantDetailFragment: Fragment() {
 
         // 카카오 리뷰 버튼 클릭 시
         binding.kakaoReviewBt.setOnClickListener {
+            val storeId = arguments?.getInt(ARG_ID) ?: -1
             parentFragmentManager.beginTransaction()
-                .replace(R.id.main, RestaurantDetailKakaoFragment())
+                .replace(
+                    R.id.main,
+                    RestaurantDetailKakaoFragment.newInstance(storeId)  // ← storeId 전달
+                )
                 .addToBackStack(null)
                 .commitAllowingStateLoss()
         }
