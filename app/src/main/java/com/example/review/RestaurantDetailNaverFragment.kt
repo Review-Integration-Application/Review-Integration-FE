@@ -86,7 +86,6 @@ class RestaurantDetailNaverFragment: Fragment() {
         val storeId = arguments?.getInt(ARG_ID) ?: -1
         if (storeId != -1) fetchNaverReviews(storeId)
 
-
         return binding.root
     }
 
