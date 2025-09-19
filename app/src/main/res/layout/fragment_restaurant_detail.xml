@@ -1,243 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    tools:context=".RestaurantDetailFragment">
 
-    <!-- 툴바 -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/restaurant_detail_toolbar"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/restaurant_detail_title_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="엄용백 돼지 국밥"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:layout_gravity="center"/>
+        <ImageView
+            android:id="@+id/back_button_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_backbutton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/back_button_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_backbutton"
-        android:background="@color/white"/>
+        <TextView
+            android:id="@+id/restaurant_detail_title_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:text="엄용백 돼지 국밥"
+            android:textColor="@android:color/black"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/back_button_iv" />
 
-    </androidx.appcompat.widget.Toolbar>
+        <TextView
+            android:id="@+id/restaurant_description_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="깔끔하고 맛있는 음식과 매력적인 인테리어"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/restaurant_detail_title_tv"
+            app:layout_constraintStart_toStartOf="@id/restaurant_detail_title_tv"
+            app:layout_constraintTop_toBottomOf="@id/restaurant_detail_title_tv" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        app:layout_constraintGuide_percent="0.07" />
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/tag_chip_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="@id/restaurant_description_tv"
+            app:layout_constraintStart_toStartOf="@id/restaurant_description_tv"
+            app:layout_constraintTop_toBottomOf="@id/restaurant_description_tv">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        app:layout_constraintGuide_percent="0.93" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_location"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="#종로구"
+                android:textColor="#555555"
+                app:chipBackgroundColor="#F0F0F0" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/white"
-        app:layout_constraintGuide_percent="0.5" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_category"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="#한식"
+                android:textColor="#555555"
+                app:chipBackgroundColor="#F0F0F0" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        app:layout_constraintGuide_percent="0.5" />
+        </com.google.android.material.chip.ChipGroup>
 
-    <TextView
-        android:id="@+id/restaurant_address_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="종로구"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintTop_toBottomOf="@+id/restaurant_detail_toolbar"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/restaurant_image_rv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingStart="24dp"
+            android:paddingEnd="12dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tag_chip_group"
+            tools:listitem="@layout/item_restaurant_image"
+            tools:itemCount="3"/>
 
-    <TextView
-        android:id="@+id/restaurant_type_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="한식"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/guideline1"
-        app:layout_constraintTop_toBottomOf="@+id/restaurant_address_tv"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/background_review_container"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/restaurant_image_rv">
 
-    <TextView
-        android:id="@+id/review_summation_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="깔끔하고 맛있는 음식과 매력적인 인테리어"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintEnd_toEndOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/restaurant_type_tv"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-<!--    <ImageView-->
-<!--        android:id="@+id/restaurant_image1_iv"-->
-<!--        android:layout_width="140dp"-->
-<!--        android:layout_height="130dp"-->
-<!--        android:src="@drawable/img1"-->
-<!--        android:layout_marginBottom="20dp"-->
-<!--        android:layout_marginStart="30dp"-->
-<!--        app:layout_constraintStart_toStartOf="@+id/guideline1"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/guideline3"/>-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-<!--    <ImageView-->
-<!--        android:id="@+id/restaurant_image2_iv"-->
-<!--        android:layout_width="150dp"-->
-<!--        android:layout_height="130dp"-->
-<!--        android:src="@drawable/img2"-->
-<!--        android:layout_marginBottom="20dp"-->
-<!--        android:layout_marginEnd="30dp"-->
-<!--        app:layout_constraintEnd_toEndOf="@+id/guideline2"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/guideline3"/>-->
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_naver" />
+                    <TextView
+                        android:id="@+id/naver_review_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Naver 리뷰"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold" />
+                </LinearLayout>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/image_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:tabIndicatorFullWidth="false"
-        app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="@color/white"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline3"
-        app:layout_constraintEnd_toEndOf="@+id/guideline2"
-        app:layout_constraintStart_toStartOf="@+id/guideline1" />
+                <com.google.android.material.chip.ChipGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:chipSpacingVertical="4dp">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/restaurant_image_pager"
-        android:layout_width="0dp"
-        android:layout_height="150dp"
-        android:clipToPadding="false"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:overScrollMode="never"
-        android:background="@color/white"
-        android:layout_marginTop="15dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintEnd_toEndOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/review_summation_tv" />
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="#진한 국물"
+                        app:chipBackgroundColor="#E0F8E4" />
 
-    <View
-        android:id="@+id/line1_v"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:background="@color/light_gray"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline3"/>
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="#깔끔함"
+                        app:chipBackgroundColor="#E0F8E4" />
 
-    <TextView
-        android:id="@+id/naver_summation_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Naver AI 브리핑"
-        android:textSize="18sp"
-        android:textColor="@color/black"
-        android:background="@color/naverColor"
-        android:layout_marginTop="45dp"
-        app:layout_constraintStart_toStartOf="@id/guideline1"
-        app:layout_constraintEnd_toEndOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/guideline3"/>
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="#웨이팅"
+                        app:chipBackgroundColor="#E0F8E4" />
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
 
-    <TextView
-        android:id="@+id/naver_summation_detail_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="(리뷰 내용)"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:layout_marginTop="30dp"
-        app:layout_constraintStart_toStartOf="@id/guideline1"
-        app:layout_constraintEnd_toEndOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/naver_summation_tv"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/kakao_summation_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Kakao AI 브리핑"
-        android:textSize="18sp"
-        android:textColor="@color/black"
-        android:background="@color/kakaoColor"
-        android:layout_marginTop="45dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintEnd_toEndOf="@id/guideline2"
-        app:layout_constraintTop_toBottomOf="@id/guideline3"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/kakao_summation_detail_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="(리뷰 내용)"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:layout_marginTop="30dp"
-        app:layout_constraintStart_toStartOf="@id/guideline4"
-        app:layout_constraintEnd_toEndOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/kakao_summation_tv"/>
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_kakao" />
+                    <TextView
+                        android:id="@+id/kakao_review_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Kakao 리뷰"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold" />
+                </LinearLayout>
 
-    <android.widget.Button
-        android:id="@+id/naver_review_bt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Naver Review"
-        android:textSize="15sp"
-        android:textColor="@color/black"
-        android:background="@drawable/naver_review_button_custom"
-        android:layout_marginTop="50dp"
-        app:layout_constraintStart_toStartOf="@id/guideline1"
-        app:layout_constraintEnd_toEndOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/naver_summation_detail_tv"/>
+                <com.google.android.material.chip.ChipGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:chipSpacingVertical="4dp">
 
-    <android.widget.Button
-        android:id="@+id/kakao_review_bt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Kakao Review"
-        android:textSize="15sp"
-        android:textColor="@color/black"
-        android:background="@drawable/kakao_review_button_custom"
-        app:layout_constraintStart_toStartOf="@id/guideline4"
-        app:layout_constraintEnd_toEndOf="@+id/guideline2"
-        app:layout_constraintTop_toTopOf="@+id/naver_review_bt"
-        app:layout_constraintBottom_toBottomOf="@+id/naver_review_bt"/>
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="#깔끔함"
+                        app:chipBackgroundColor="#FFF9E0" />
 
-    <View
-        android:id="@+id/line2_v"
-        android:layout_width="2dp"
-        android:layout_height="100dp"
-        android:background="@color/light_gray"
-        android:layout_marginTop="50dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintEnd_toEndOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/guideline3"/>
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="#진한 국물"
+                        app:chipBackgroundColor="#FFF9E0" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="#웨이팅"
+                        app:chipBackgroundColor="#FFF9E0" />
+                </com.google.android.material.chip.ChipGroup>
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
