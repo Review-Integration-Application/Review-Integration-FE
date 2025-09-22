@@ -1,12 +1,20 @@
 package com.example.review
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.review.api.Response.RestaurantResponse
@@ -16,6 +24,8 @@ import com.example.review.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -34,6 +44,29 @@ import kotlin.coroutines.resume
 class MainActivity : AppCompatActivity() {
 
     private val addressCache = mutableMapOf<String, LatLng>()
+
+    private fun createMarkerIconWithText(context: Context, storeName: String): BitmapDescriptor {
+        // 1. marker_layout.xml을 인플레이트합니다.
+        val markerView = (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
+            .inflate(R.layout.marker_layout, null)
+
+        // 2. 레이아웃의 TextView에 식당 이름을 설정합니다.
+        val tvMarkerName = markerView.findViewById<TextView>(R.id.tv_marker_name)
+        tvMarkerName.text = storeName
+
+        // 3. View의 크기를 측정하고 레이아웃을 강제로 그립니다.
+        // 이 과정이 없으면 View가 그려지지 않아 Bitmap이 비어있게 됩니다.
+        markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
+
+        // 4. View를 Bitmap으로 변환합니다.
+        val bitmap = Bitmap.createBitmap(markerView.measuredWidth, markerView.measuredHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        markerView.draw(canvas)
+
+        // 5. Bitmap을 BitmapDescriptor로 변환하여 반환합니다.
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
 
     private fun normalizeAddress(raw: String?): String {
         if (raw.isNullOrBlank()) return ""
@@ -149,53 +182,43 @@ class MainActivity : AppCompatActivity() {
                     response: Response<List<RestaurantResponse>>
                 ) {
                     if (response.isSuccessful) {
-                        Log.d("서어어어어어어ㅓ엉ㅇ고오오오오옹", "성공성공")
-//                        val restaurants = response.body() ?: emptyList()
-//                        runOnUiThread {
-//                            for (restaurant in restaurants) {
-//                                val marker = map.addMarker(
-//                                    MarkerOptions()
-//                                        .position(LatLng(restaurant.lat, restaurant.lng))
-//                                        .title(restaurant.restore_name)
-//                                )
-//                                marker?.let {
-//                                    markerRestaurantMap[it] = restaurant
-//                                }
-//                            }
-//                        }
                         val restaurants = response.body().orEmpty()
 
                         // 주소만으로 마커 찍기
                         lifecycleScope.launch {
                             for (restaurant in restaurants) {
-                                val addr = normalizeAddress(restaurant.address) // <- 실제 필드명 확인
-
+                                val addr = normalizeAddress(restaurant.address)
                                 val pos = geocodeAddressCompat(addr)
+
                                 if (pos != null) {
+                                    // ▼▼▼▼▼ 여기부터 수정 ▼▼▼▼▼
+
+                                    // 3단계에서 만든 함수를 호출하여 텍스트가 포함된 마커 아이콘을 생성합니다.
+                                    val customMarkerIcon = createMarkerIconWithText(this@MainActivity, restaurant.store_name)
+
                                     val marker = map.addMarker(
                                         MarkerOptions()
                                             .position(pos)
-                                            .title(restaurant.store_name) // 타이틀로 매장명
+                                            // .title()은 이제 정보창에서만 보이므로 그대로 두거나 제거해도 됩니다.
+                                            .title(restaurant.store_name)
+                                            .icon(customMarkerIcon) // 생성된 아이콘 적용
                                     )
                                     marker?.let { markerRestaurantMap[it] = restaurant }
+
+                                    // ▲▲▲▲▲ 여기까지 수정 ▲▲▲▲▲
                                 } else {
                                     Log.w("Geocode", "주소 지오코딩 실패: $addr")
                                 }
-
-                                // 연속 지오코딩 방지 (조절 가능)
                                 delay(120)
                             }
                         }
-
                     } else {
                         Log.e("API 응답 실패", "HTTP ${response.code()}  ${response.errorBody()?.string()}")
                     }
                 }
-
                 override fun onFailure(call: Call<List<RestaurantResponse>>, t: Throwable) {
                     Log.e("API 연동 실패", "onFailure", t)
                 }
-
             })
 
             // 마커 클릭 시 바텀시트 등장 (RestaurantResponse 사용)
