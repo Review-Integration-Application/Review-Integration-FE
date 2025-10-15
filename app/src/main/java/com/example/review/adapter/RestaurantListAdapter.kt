@@ -25,12 +25,10 @@ class RestaurantListAdapter(private val onItemClick: (RestaurantResponse) -> Uni
     class RestaurantViewHolder(itemView: View, val onItemClick: (RestaurantResponse) -> Unit) : RecyclerView.ViewHolder(itemView) {
         private val nameTextView: TextView = itemView.findViewById(R.id.tv_restaurant_name_item)
         private val categoryTextView: TextView = itemView.findViewById(R.id.tv_restaurant_category_item)
-        private val summaryTextView: TextView = itemView.findViewById(R.id.tv_restaurant_summary_item)
 
         fun bind(restaurant: RestaurantResponse) {
             nameTextView.text = restaurant.store_name
             categoryTextView.text = restaurant.category
-            summaryTextView.text = restaurant.review_summary ?: "리뷰 요약 정보가 없습니다."
 
             // 아이템 뷰 클릭 시 람다 실행
             itemView.setOnClickListener {
