@@ -23,14 +23,4 @@
         android:layout_marginTop="4dp"
         android:textSize="14sp"/>
 
-    <TextView
-        android:id="@+id/tv_restaurant_summary_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="리뷰 요약"
-        android:layout_marginTop="4dp"
-        android:textSize="14sp"
-        android:maxLines="1"
-        android:ellipsize="end"/>
-
 </LinearLayout>
