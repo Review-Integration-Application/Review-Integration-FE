@@ -1,21 +1,21 @@
 package com.example.review
 
+import RestaurantListAdapter
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.review.api.Response.RestaurantResponse
 import com.example.review.api.RestoreItf
@@ -45,26 +45,186 @@ class MainActivity : AppCompatActivity() {
 
     private val addressCache = mutableMapOf<String, LatLng>()
 
+    // ▼▼▼▼▼ 새로 추가된 프로퍼티 ▼▼▼▼▼
+    private lateinit var restaurantListAdapter: RestaurantListAdapter
+    private var restaurantList = listOf<RestaurantResponse>()
+    private val markerRestaurantMap = mutableMapOf<Marker, RestaurantResponse>()
+    // ▲▲▲▲▲ 새로 추가된 프로퍼티 ▲▲▲▲▲
+
+    lateinit var binding: ActivityMainBinding
+    private lateinit var mainGoogleMap: GoogleMap
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private var selectedRestaurant: RestaurantResponse? = null
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // ▼▼▼▼▼ 새로 추가된 함수 호출 ▼▼▼▼▼
+        setupDrawer()
+        setupRecyclerView()
+        // ▲▲▲▲▲ 새로 추가된 함수 호출 ▲▲▲▲▲
+
+        // 프래그먼트 백스택 변경 감지
+        supportFragmentManager.addOnBackStackChangedListener {
+            // 백스택에 프래그먼트가 하나도 없으면 (즉, 메인 지도 화면이면)
+            if (supportFragmentManager.backStackEntryCount == 0) {
+                binding.menuButtonIv.visibility = View.VISIBLE
+            }
+        }
+
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        val mapFragment: SupportMapFragment
+        if (savedInstanceState == null) {
+            mapFragment = SupportMapFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container, mapFragment, "map")
+                .commit()
+        } else {
+            mapFragment = supportFragmentManager.findFragmentByTag("map") as SupportMapFragment
+        }
+
+        mapFragment.getMapAsync { map ->
+            mainGoogleMap = map
+            map.uiSettings.isZoomControlsEnabled = true
+            map.uiSettings.isMyLocationButtonEnabled = false
+
+            val jongnoLatLng = LatLng(37.572950, 126.979357)
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(jongnoLatLng, 15f))
+
+            // API 호출 및 마커 생성 로직을 별도 함수로 분리
+            fetchAndDisplayRestaurants(map)
+        }
+
+        binding.bottomSheet.setOnClickListener {
+            binding.menuButtonIv.visibility = View.GONE
+            selectedRestaurant?.let { restaurant ->
+                val fragment = RestaurantDetailFragment.newInstance(restaurant.store_id)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+    }
+
+    // ▼▼▼▼▼ Drawer 설정 함수 (신규) ▼▼▼▼▼
+    private fun setupDrawer() {
+        binding.menuButtonIv.setOnClickListener {
+            binding.drawerLayout.openDrawer(GravityCompat.START)
+        }
+    }
+    // ▲▲▲▲▲ Drawer 설정 함수 (신규) ▲▲▲▲▲
+
+    // ▼▼▼▼▼ RecyclerView 설정 함수 (신규) ▼▼▼▼▼
+    private fun setupRecyclerView() {
+        restaurantListAdapter = RestaurantListAdapter { restaurant ->
+            // 리스트 아이템 클릭 시 실행될 코드
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+
+            // 클릭한 식당의 마커 찾기
+            val marker = markerRestaurantMap.entries.find { it.value.store_id == restaurant.store_id }?.key
+
+            marker?.let {
+                mainGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it.position, 16f))
+                showBottomSheetForRestaurant(restaurant)
+            }
+        }
+
+        binding.navView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.restaurant_recycler_view).apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = restaurantListAdapter
+        }
+    }
+    // ▲▲▲▲▲ RecyclerView 설정 함수 (신규) ▲▲▲▲▲
+
+
+    // ▼▼▼▼▼ API 호출 및 마커 생성 로직 (분리된 함수) ▼▼▼▼▼
+    private fun fetchAndDisplayRestaurants(map: GoogleMap) {
+        val restoreService = RetrofitBaseObj.getRetrofit().create(RestoreItf::class.java)
+        restoreService.getRestaurants().enqueue(object : Callback<List<RestaurantResponse>> {
+            override fun onResponse(call: Call<List<RestaurantResponse>>, response: Response<List<RestaurantResponse>>) {
+                if (response.isSuccessful) {
+                    restaurantList = response.body().orEmpty()
+                    restaurantListAdapter.submitList(restaurantList) // RecyclerView 업데이트
+
+                    lifecycleScope.launch {
+                        for (restaurant in restaurantList) {
+                            val addr = normalizeAddress(restaurant.address)
+                            val pos = geocodeAddressCompat(addr)
+
+                            if (pos != null) {
+                                val customMarkerIcon = createMarkerIconWithText(this@MainActivity, restaurant.store_name)
+                                val marker = map.addMarker(
+                                    MarkerOptions()
+                                        .position(pos)
+                                        .title(restaurant.store_name)
+                                        .icon(customMarkerIcon)
+                                )
+                                marker?.let { markerRestaurantMap[it] = restaurant }
+                            } else {
+                                Log.w("Geocode", "주소 지오코딩 실패: $addr")
+                            }
+                            delay(120)
+                        }
+                    }
+                } else {
+                    Log.e("API 응답 실패", "HTTP ${response.code()} ${response.errorBody()?.string()}")
+                }
+            }
+            override fun onFailure(call: Call<List<RestaurantResponse>>, t: Throwable) {
+                Log.e("API 연동 실패", "onFailure", t)
+            }
+        })
+
+        map.setOnMarkerClickListener { marker ->
+            markerRestaurantMap[marker]?.let { restaurant ->
+                showBottomSheetForRestaurant(restaurant)
+            }
+            true
+        }
+    }
+    // ▲▲▲▲▲ API 호출 및 마커 생성 로직 (분리된 함수) ▲▲▲▲▲
+
+
+    // ▼▼▼▼▼ 바텀시트 표시 함수 (분리된 함수) ▼▼▼▼▼
+    private fun showBottomSheetForRestaurant(restaurant: RestaurantResponse) {
+        selectedRestaurant = restaurant
+        binding.tvRestaurantName.text = restaurant.store_name
+        binding.tvRestaurantDesc.text = "총 리뷰 ${restaurant.total_review_num}"
+        binding.reviewSummationTv.text = restaurant.review_summary
+
+        restaurant.img_urls?.let { urls ->
+            val firstUrl = urls.split(",").firstOrNull()?.trim()
+            if (!firstUrl.isNullOrEmpty()) {
+                Glide.with(this).load(firstUrl).centerCrop().into(binding.reviewMainImageIv)
+            } else {
+                binding.reviewMainImageIv.setImageDrawable(null)
+            }
+        } ?: run {
+            binding.reviewMainImageIv.setImageDrawable(null)
+        }
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+    // ▲▲▲▲▲ 바텀시트 표시 함수 (분리된 함수) ▲▲▲▲▲
+
+
+    // ▼▼▼▼▼ 아래는 기존과 동일한 유틸리티 함수들 ▼▼▼▼▼
     private fun createMarkerIconWithText(context: Context, storeName: String): BitmapDescriptor {
-        // 1. marker_layout.xml을 인플레이트합니다.
         val markerView = (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
             .inflate(R.layout.marker_layout, null)
-
-        // 2. 레이아웃의 TextView에 식당 이름을 설정합니다.
         val tvMarkerName = markerView.findViewById<TextView>(R.id.tv_marker_name)
         tvMarkerName.text = storeName
-
-        // 3. View의 크기를 측정하고 레이아웃을 강제로 그립니다.
-        // 이 과정이 없으면 View가 그려지지 않아 Bitmap이 비어있게 됩니다.
         markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
         markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
-
-        // 4. View를 Bitmap으로 변환합니다.
         val bitmap = Bitmap.createBitmap(markerView.measuredWidth, markerView.measuredHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         markerView.draw(canvas)
-
-        // 5. Bitmap을 BitmapDescriptor로 변환하여 반환합니다.
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
@@ -72,32 +232,18 @@ class MainActivity : AppCompatActivity() {
         if (raw.isNullOrBlank()) return ""
         return raw
             .replace("\n", " ")
-            .replace(Regex("\\(.*?\\)"), "") // 괄호 안 설명 제거
+            .replace(Regex("\\(.*?\\)"), "")
             .replace(Regex("\\s+"), " ")
             .trim()
     }
 
-    // (선택) 서울 바운딩 박스
-    private val SEOUL_SOUTH = 37.40
-    private val SEOUL_WEST  = 126.80
-    private val SEOUL_NORTH = 37.70
-    private val SEOUL_EAST  = 127.20
-
     private suspend fun geocodeAddressCompat(query: String): LatLng? {
         if (query.isBlank()) return null
-
-        // 캐시 먼저 확인
         addressCache[query]?.let { return it }
-
         val geocoder = Geocoder(this, Locale.KOREA)
-
         return try {
             val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                // API 33+: 콜백 기반
                 suspendCancellableCoroutine<LatLng?> { cont ->
-                    // 바운딩 박스 bias를 쓰고 싶다면 아래 주석 해제해서 사용:
-                    // geocoder.getFromLocationName(query, 1, SEOUL_SOUTH, SEOUL_WEST, SEOUL_NORTH, SEOUL_EAST, object : Geocoder.GeocodeListener { ... })
-
                     geocoder.getFromLocationName(query, 1, object : Geocoder.GeocodeListener {
                         override fun onGeocode(addresses: MutableList<android.location.Address>) {
                             val p = addresses.firstOrNull()
@@ -110,159 +256,15 @@ class MainActivity : AppCompatActivity() {
                     })
                 }
             } else {
-                // API 32 이하: 동기식 → IO에서 실행
                 withContext(Dispatchers.IO) {
-                    // 바운딩 박스 bias 예시:
-                    // val list = geocoder.getFromLocationName(query, 1, SEOUL_SOUTH, SEOUL_WEST, SEOUL_NORTH, SEOUL_EAST)
                     val list = geocoder.getFromLocationName(query, 1)
                     val p = list?.firstOrNull()
                     p?.let { LatLng(it.latitude, it.longitude) }
                 }
             }
-
             result?.also { addressCache[query] = it }
         } catch (e: Exception) {
             null
-        }
-    }
-
-    lateinit var binding: ActivityMainBinding
-    private lateinit var mainGoogleMap: GoogleMap
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private var selectedRestaurant: RestaurantResponse? = null
-
-    //data class Restaurant(val name: String, val desc: String, val lat: Double, val lng: Double)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // 바텀시트 Behavior 연결
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN // 처음엔 숨김!
-
-        // 지도 fragment를 add할 때, 인스턴스를 변수에 저장
-        val mapFragment: SupportMapFragment
-        if (savedInstanceState == null) {
-            mapFragment = SupportMapFragment.newInstance()
-            supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container, mapFragment, "map")
-                .commit()
-        } else {
-            mapFragment = supportFragmentManager.findFragmentByTag("map") as SupportMapFragment
-        }
-
-        // SupportMapFragment 얻어서 getMapAsync 등록
-        mapFragment.getMapAsync { map ->
-            mainGoogleMap = map
-            map.uiSettings.isZoomControlsEnabled = true
-            map.uiSettings.isMyLocationButtonEnabled = false
-
-            // 종로구 카메라 초기 위치
-            val jongnoLatLng = LatLng(37.572950, 126.979357)
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(jongnoLatLng, 15f))
-
-            // 식당 데이터 (임시)
-//            val restaurants = listOf(
-//                Restaurant("송추가마골 인어반 광화문점", "★4.3 / 총 리뷰 300", 37.5725, 126.9789),
-//                Restaurant("박순례 손말이고기 산정집 광화문점", "★4.0 / 총 리뷰 250", 37.5730, 126.9814),
-//                Restaurant("족발야시장&무청감자탕 광화문점", "★4.4 / 총 리뷰 270", 37.5717, 126.9768),
-//                Restaurant("오가와", "★4.2 / 총 리뷰 280", 37.5724, 126.9826)
-//            )
-
-            // 마커와 식당 연결
-            val markerRestaurantMap = mutableMapOf<Marker, RestaurantResponse>()
-
-            // 식당 조회 API
-            val restoreService = RetrofitBaseObj.getRetrofit().create(RestoreItf::class.java)
-            restoreService.getRestaurants().enqueue(object: Callback<List<RestaurantResponse>>{
-                override fun onResponse(
-                    call: Call<List<RestaurantResponse>>,
-                    response: Response<List<RestaurantResponse>>
-                ) {
-                    if (response.isSuccessful) {
-                        val restaurants = response.body().orEmpty()
-
-                        // 주소만으로 마커 찍기
-                        lifecycleScope.launch {
-                            for (restaurant in restaurants) {
-                                val addr = normalizeAddress(restaurant.address)
-                                val pos = geocodeAddressCompat(addr)
-
-                                if (pos != null) {
-                                    // ▼▼▼▼▼ 여기부터 수정 ▼▼▼▼▼
-
-                                    // 3단계에서 만든 함수를 호출하여 텍스트가 포함된 마커 아이콘을 생성합니다.
-                                    val customMarkerIcon = createMarkerIconWithText(this@MainActivity, restaurant.store_name)
-
-                                    val marker = map.addMarker(
-                                        MarkerOptions()
-                                            .position(pos)
-                                            // .title()은 이제 정보창에서만 보이므로 그대로 두거나 제거해도 됩니다.
-                                            .title(restaurant.store_name)
-                                            .icon(customMarkerIcon) // 생성된 아이콘 적용
-                                    )
-                                    marker?.let { markerRestaurantMap[it] = restaurant }
-
-                                    // ▲▲▲▲▲ 여기까지 수정 ▲▲▲▲▲
-                                } else {
-                                    Log.w("Geocode", "주소 지오코딩 실패: $addr")
-                                }
-                                delay(120)
-                            }
-                        }
-                    } else {
-                        Log.e("API 응답 실패", "HTTP ${response.code()}  ${response.errorBody()?.string()}")
-                    }
-                }
-                override fun onFailure(call: Call<List<RestaurantResponse>>, t: Throwable) {
-                    Log.e("API 연동 실패", "onFailure", t)
-                }
-            })
-
-            // 마커 클릭 시 바텀시트 등장 (RestaurantResponse 사용)
-            map.setOnMarkerClickListener { marker ->
-                markerRestaurantMap[marker]?.let { restaurant ->
-                    binding.tvRestaurantName.text = restaurant.store_name
-                    binding.tvRestaurantDesc.text = "총 리뷰 ${restaurant.total_review_num}"
-                    binding.reviewSummationTv.text = restaurant.review_summary
-
-                    // 이미지 URL 적용
-                    restaurant.img_urls?.let { urls ->
-                        val firstUrl = urls.split(",").firstOrNull()?.trim()
-                        if (!firstUrl.isNullOrEmpty()) {
-                            Glide.with(this)
-                                .load(firstUrl)
-                                .centerCrop()
-                                .into(binding.reviewMainImageIv)
-                        } else {
-                            binding.reviewMainImageIv.setImageDrawable(null) // 빈 상태로
-                        }
-                    } ?: run {
-                        binding.reviewMainImageIv.setImageDrawable(null) // 빈 상태로
-                    }
-
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    selectedRestaurant = restaurant
-                    // 클릭된 식당 저장 (Restaurant 타입)
-                }
-                true
-            }
-        }
-
-        // 바텀시트 클릭 시 상세화면으로 이동
-        binding.bottomSheet.setOnClickListener {
-            selectedRestaurant?.let { restaurant ->
-                val fragment = RestaurantDetailFragment.newInstance(restaurant.store_id)
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, fragment) // 반드시 fragment_container!
-                    .addToBackStack(null)
-                    .commit()
-
-                // 바텀시트 숨기기
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
         }
     }
 }
