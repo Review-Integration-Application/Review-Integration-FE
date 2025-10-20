@@ -197,7 +197,7 @@ class MainActivity : AppCompatActivity() {
         selectedRestaurant = restaurant
         binding.tvRestaurantName.text = restaurant.store_name
         binding.tvRestaurantDesc.text = "총 리뷰 ${restaurant.total_review_num}"
-        binding.reviewSummationTv.text = restaurant.review_summary
+        binding.reviewSummationTv.text = restaurant.review_summary ?: "깔끔하고 맛있는 음식과 매력적인 인테리어"
 
         restaurant.img_urls?.let { urls ->
             val firstUrl = urls.split(",").firstOrNull()?.trim()

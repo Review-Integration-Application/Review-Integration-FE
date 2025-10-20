@@ -131,7 +131,7 @@ class RestaurantDetailFragment: Fragment() {
                 }
 
                 binding.restaurantDetailTitleTv.text = detail.store_name ?: "이름 미제공"
-                binding.restaurantDescriptionTv.text = detail.review_summary ?: ""
+                binding.restaurantDescriptionTv.text = detail.review_summary ?: "깔끔하고 맛있는 음식과 매력적인 인테리어"
                 val category = detail.category
                 if (!category.isNullOrBlank()) {
                     binding.chipCategory.text = "#$category"
