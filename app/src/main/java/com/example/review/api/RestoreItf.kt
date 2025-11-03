@@ -5,6 +5,7 @@ import com.example.review.api.Response.NaverReviewResponse
 import com.example.review.api.Response.RestaurantDetailResponse
 import retrofit2.Call
 import com.example.review.api.Response.RestaurantResponse
+import com.example.review.api.Response.ReviewSummaryResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -25,5 +26,9 @@ interface RestoreItf {
     // 카카오 리뷰 조회
     @GET("kakao_review/{store_id}")
     fun getKakaoReview(@Path("store_id") storeId: Int): Call<List<KakaoReviewResponse>>
+
+    // 리뷰 요약 조회
+    @GET("review_summary/{store_id}")
+    fun getReviewSummary(@Path("store_id") storeId: Int): Call<ReviewSummaryResponse>
 
 }
