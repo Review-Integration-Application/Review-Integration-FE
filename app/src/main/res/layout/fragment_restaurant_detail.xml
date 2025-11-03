@@ -136,24 +136,28 @@
                 </LinearLayout>
 
                 <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/naver_hashtag_cg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     app:chipSpacingVertical="4dp">
 
                     <com.google.android.material.chip.Chip
+                        android:id="@+id/naver_hashtag1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="#진한 국물"
                         app:chipBackgroundColor="#E0F8E4" />
 
                     <com.google.android.material.chip.Chip
+                        android:id="@+id/naver_hashtag2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="#깔끔함"
                         app:chipBackgroundColor="#E0F8E4" />
 
                     <com.google.android.material.chip.Chip
+                        android:id="@+id/naver_hashtag3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="#웨이팅"
@@ -189,24 +193,28 @@
                 </LinearLayout>
 
                 <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/kakao_hashtag_cg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     app:chipSpacingVertical="4dp">
 
                     <com.google.android.material.chip.Chip
+                        android:id="@+id/kakao_hashtag1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="#깔끔함"
                         app:chipBackgroundColor="#FFF9E0" />
 
                     <com.google.android.material.chip.Chip
+                        android:id="@+id/kakao_hashtag2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="#진한 국물"
                         app:chipBackgroundColor="#FFF9E0" />
 
                     <com.google.android.material.chip.Chip
+                        android:id="@+id/kakao_hashtag3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="#웨이팅"
@@ -242,9 +250,10 @@
                     android:text="👍 고객 만족 포인트 (장점)"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/good_point_content_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -269,6 +278,7 @@
                     android:textStyle="bold"/>
 
                 <TextView
+                    android:id="@+id/bad_point_content_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
