@@ -1,10 +1,12 @@
 package com.example.review
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,9 +17,12 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.review.adapter.ImageSliderAdapter
 import com.example.review.adapter.RestaurantImageAdapter
 import com.example.review.api.Response.RestaurantDetailResponse
+import com.example.review.api.Response.ReviewSummaryResponse
 import com.example.review.api.RestoreItf
 import com.example.review.api.RetrofitBaseObj
 import com.example.review.databinding.FragmentRestaurantDetailBinding
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import retrofit2.Call
@@ -46,6 +51,7 @@ class RestaurantDetailFragment: Fragment() {
 //    private var isPagerCallbackRegistered = false
 
     private lateinit var imageAdapter: RestaurantImageAdapter
+    private var storeId: Int = -1 // storeId를 멤버 변수로 저장
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,6 +64,8 @@ class RestaurantDetailFragment: Fragment() {
 //        pagerAdapter = ImageSliderAdapter(emptyList())
 //        binding.restaurantImagePager.adapter = pagerAdapter
 //        binding.restaurantImagePager.offscreenPageLimit = 1
+
+        storeId = arguments?.getInt(ARG_ID) ?: -1 // storeId 저장
 
         // RecyclerView를 미리 설정합니다.
         setupRecyclerView()
@@ -76,20 +84,23 @@ class RestaurantDetailFragment: Fragment() {
     }
 
     private fun setupClickListeners() {
+        // storeId가 -1이 아닌지 확인 후 사용
         binding.naverReviewTv.setOnClickListener {
-            val storeId = arguments?.getInt(ARG_ID) ?: -1
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.main, RestaurantDetailNaverFragment.newInstance(storeId))
-                .addToBackStack(null)
-                .commitAllowingStateLoss()
+            if (storeId != -1) {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.main, RestaurantDetailNaverFragment.newInstance(storeId))
+                    .addToBackStack(null)
+                    .commitAllowingStateLoss()
+            }
         }
 
         binding.kakaoReviewTv.setOnClickListener {
-            val storeId = arguments?.getInt(ARG_ID) ?: -1
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.main, RestaurantDetailKakaoFragment.newInstance(storeId))
-                .addToBackStack(null)
-                .commitAllowingStateLoss()
+            if (storeId != -1) {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.main, RestaurantDetailKakaoFragment.newInstance(storeId))
+                    .addToBackStack(null)
+                    .commitAllowingStateLoss()
+            }
         }
 
         binding.backButtonIv.setOnClickListener {
@@ -100,7 +111,6 @@ class RestaurantDetailFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val storeId = arguments?.getInt(ARG_ID) ?: -1
         if (storeId == -1) {
             binding.restaurantDetailTitleTv.text = "식당 정보 없음"
             return
@@ -108,10 +118,19 @@ class RestaurantDetailFragment: Fragment() {
 
         Log.d("식당 아이디", storeId.toString())
 
-        // 식당 상세 조회 api
+        // API 서비스를 한 번만 생성
         val restoreDetailService = RetrofitBaseObj.getRetrofit().create(RestoreItf::class.java)
-        restoreDetailService.getRestaurant(storeId).enqueue(object:
-            Callback<RestaurantDetailResponse>{
+
+        // 1. 식당 상세 조회 API 호출
+        loadRestaurantDetails(restoreDetailService)
+
+        // 2. [추가] 리뷰 요약 API 호출
+        loadReviewSummary(restoreDetailService)
+    }
+
+    // [수정] 식당 상세 정보 로드 함수
+    private fun loadRestaurantDetails(service: RestoreItf) {
+        service.getRestaurant(storeId).enqueue(object: Callback<RestaurantDetailResponse> {
             override fun onResponse(
                 call: Call<RestaurantDetailResponse>,
                 response: Response<RestaurantDetailResponse>
@@ -140,14 +159,12 @@ class RestaurantDetailFragment: Fragment() {
                     binding.chipCategory.isVisible = false
                 }
 
-                // 이미지 URL 파싱
                 val urls = detail.img_urls
                     ?.split(",", ";")
                     ?.map { it.trim() }
                     ?.filter { it.isNotEmpty() && it.lowercase() != "none" }
                     .orEmpty()
 
-                // [수정됨] ViewPager2 대신 RecyclerView 업데이트
                 binding.restaurantImageRv.isVisible = urls.isNotEmpty()
                 imageAdapter.updateUrls(urls)
             }
@@ -156,15 +173,98 @@ class RestaurantDetailFragment: Fragment() {
                 if (!isAdded) return
                 Log.e("DETAIL", "onFailure: ${t.message}", t)
                 binding.restaurantDetailTitleTv.text = "조회 실패"
-                binding.restaurantImageRv.isVisible = false // 실패 시 이미지 뷰 숨김
+                binding.restaurantImageRv.isVisible = false
+            }
+        })
+    }
+
+    // === [추가] 리뷰 요약 (장/단점, 해시태그) 로드 함수 ===
+    private fun loadReviewSummary(service: RestoreItf) {
+        service.getReviewSummary(storeId).enqueue(object: Callback<ReviewSummaryResponse> {
+            override fun onResponse(
+                call: Call<ReviewSummaryResponse>,
+                response: Response<ReviewSummaryResponse>
+            ) {
+                if (!isAdded || _binding == null) return // 뷰가 파괴된 경우 방지
+
+                if (response.isSuccessful && response.body() != null) {
+                    val summary = response.body()!!
+
+                    // 1. 장점/단점 텍스트 설정 (XML에서 수정한 ID 사용)
+                    binding.goodPointContentTv.text = summary.good_points?.ifBlank { "정보 없음" } ?: "정보 없음"
+                    binding.badPointContentTv.text = summary.bad_points?.ifBlank { "정보 없음" } ?: "정보 없음"
+
+                    // 2. 해시태그 Chip 동적 생성
+                    // (CSV 데이터가 "#태그1 #태그2" 처럼 공백으로 구분되어 있다고 가정)
+                    setupHashtagChips(
+                        binding.naverHashtagCg,
+                        summary.naver_hashtag,
+                        R.color.naverColor // colors.xml에 색상 정의 필요
+                    )
+                    setupHashtagChips(
+                        binding.kakaoHashtagCg,
+                        summary.kakao_hashtag,
+                        R.color.kakaoColor // colors.xml에 색상 정의 필요
+                    )
+
+                } else {
+                    Log.e("SUMMARY", "HTTP ${response.code()} ${response.errorBody()?.string()}")
+                    binding.goodPointContentTv.text = "요약 정보 조회 실패"
+                    binding.badPointContentTv.text = "요약 정보 조회 실패"
+                }
             }
 
+            override fun onFailure(call: Call<ReviewSummaryResponse>, t: Throwable) {
+                if (!isAdded || _binding == null) return
+                Log.e("SUMMARY", "onFailure: ${t.message}", t)
+                binding.goodPointContentTv.text = "요약 정보 로드 실패"
+                binding.badPointContentTv.text = "요약 정보 로드 실패"
+            }
         })
+    }
 
-        // 백버튼 클릭 시
-        binding.backButtonIv.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+    // === [추가] 해시태그 문자열을 파싱하여 Chip을 동적으로 추가하는 함수 ===
+    private fun setupHashtagChips(chipGroup: ChipGroup, hashtagString: String?, chipColorResId: Int) {
+        chipGroup.removeAllViews() // 기존에 XML에 있던 정적 칩 제거
+
+        if (hashtagString.isNullOrBlank()) {
+            // 해시태그가 없을 때 "정보 없음" 칩 하나만 추가
+            val noDataChip = createChip("정보 없음", R.color.naverColor) // default 색상 필요
+            chipGroup.addView(noDataChip)
+            return
         }
+
+        val hashtags = hashtagString.split(" ") // 공백으로 태그 분리
+            .map { it.trim() }
+            .filter { it.isNotEmpty() } // 빈 문자열 제거
+
+        if (hashtags.isEmpty()) {
+            val noDataChip = createChip("정보 없음", R.color.kakaoColor)
+            chipGroup.addView(noDataChip)
+            return
+        }
+
+        // CSV 파일에 `#`이 포함된 채로 저장되어 있으므로, 그대로 사용
+        hashtags.forEach { tag ->
+            val chip = createChip(tag, chipColorResId)
+            chipGroup.addView(chip)
+        }
+    }
+
+    // === [추가] Chip을 생성하는 헬퍼 함수 ===
+    private fun createChip(tag: String, chipColorResId: Int) : Chip {
+        val chip = Chip(context) // requireContext() 대신 context 사용 (null 안전)
+        chip.text = tag
+
+        // colors.xml에 정의된 색상 리소스를 가져옵니다.
+        val chipColor = ContextCompat.getColor(requireContext(), chipColorResId)
+        chip.chipBackgroundColor = ColorStateList.valueOf(chipColor)
+
+        // 텍스트 색상 등 추가 스타일 설정
+        // chip.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        // chip.isClickable = false
+        // chip.isCheckable = false
+        return chip
     }
 
     override fun onDestroyView() {
