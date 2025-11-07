@@ -16,6 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.review.adapter.ImageSliderAdapter
 import com.example.review.adapter.RestaurantImageAdapter
+import com.example.review.api.Response.ImageResponse
 import com.example.review.api.Response.RestaurantDetailResponse
 import com.example.review.api.Response.ReviewSummaryResponse
 import com.example.review.api.RestoreItf
@@ -124,8 +125,11 @@ class RestaurantDetailFragment: Fragment() {
         // 1. 식당 상세 조회 API 호출
         loadRestaurantDetails(restoreDetailService)
 
-        // 2. [추가] 리뷰 요약 API 호출
+        // 2. 리뷰 요약 API 호출
         loadReviewSummary(restoreDetailService)
+
+        // 3. 리뷰 요약 이미지 API 호출
+        loadSummaryImage(restoreDetailService)
     }
 
     // [수정] 식당 상세 정보 로드 함수
@@ -219,6 +223,49 @@ class RestaurantDetailFragment: Fragment() {
                 Log.e("SUMMARY", "onFailure: ${t.message}", t)
                 binding.goodPointContentTv.text = "요약 정보 로드 실패"
                 binding.badPointContentTv.text = "요약 정보 로드 실패"
+            }
+        })
+    }
+
+    // 4. [추가] 리뷰 요약 (긍/부정) 이미지 로드 함수
+    private fun loadSummaryImage(service: RestoreItf) {
+        if (storeId == -1) return // storeId 없으면 중단
+
+        service.getRestaurantImage(storeId).enqueue(object : Callback<ImageResponse> {
+            override fun onResponse(
+                call: Call<ImageResponse>,
+                response: Response<ImageResponse>
+            ) {
+                // Fragment가 파괴되었거나 view binding이 null이면 중단
+                if (!isAdded || _binding == null) return
+
+                if (response.isSuccessful && response.body() != null) {
+                    val imageUrl = response.body()!!.imageUrl
+
+                    // 서버에서 받은 URL이 유효한지 확인
+                    if (!imageUrl.isNullOrBlank()) {
+
+                        // Glide를 사용해 XML의 review_summary_percent_iv에 이미지 로드
+                        Glide.with(requireContext()) // or this@RestaurantDetailFragment
+                            .load(imageUrl) // 서버에서 받은 URL
+                            .into(binding.reviewSummaryPercentIv) // XML의 ImageView ID
+
+                    } else {
+                        // URL이 null이거나 비어있는 경우
+                        Log.w("SUMMARY_IMAGE", "Image URL is null or blank.")
+                        // 필요시 기본 이미지를 설정하거나 숨길 수 있습니다.
+                        // binding.reviewSummaryPercentIv.isVisible = false
+                    }
+                } else {
+                    // HTTP 응답 실패
+                    Log.e("SUMMARY_IMAGE", "Response failed: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ImageResponse>, t: Throwable) {
+                if (!isAdded || _binding == null) return
+                // 네트워크 오류 등
+                Log.e("SUMMARY_IMAGE", "onFailure: ${t.message}", t)
             }
         })
     }
