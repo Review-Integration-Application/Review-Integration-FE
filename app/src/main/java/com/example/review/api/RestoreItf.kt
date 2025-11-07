@@ -1,5 +1,6 @@
 package com.example.review.api
 
+import com.example.review.api.Response.ImageResponse
 import com.example.review.api.Response.KakaoReviewResponse
 import com.example.review.api.Response.NaverReviewResponse
 import com.example.review.api.Response.RestaurantDetailResponse
@@ -30,5 +31,9 @@ interface RestoreItf {
     // 리뷰 요약 조회
     @GET("review_summary/{store_id}")
     fun getReviewSummary(@Path("store_id") storeId: Int): Call<ReviewSummaryResponse>
+
+    // 리뷰 요약 긍정 or 부정 이미지 조회 API
+    @GET("restaurant_image/{store_id}")
+    fun getRestaurantImage(@Path("store_id") storeId: Int): Call<ImageResponse>
 
 }
