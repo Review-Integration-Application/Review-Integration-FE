@@ -52,5 +52,4 @@
 ### 2. AI 상세 요약 및 리뷰 (AI Summary & Integration)
 | 통합 정보 & 태그 | AI 장단점 요약 | 플랫폼별 리뷰 통합 |
 | :---: | :---: | :---: |
-| <img src="images/detail_main.jpg" width="250"/> | <img src="images/detail_summary.jpg" width="250"/> | <img src="images/review_list.jpg" width="250"/> |
 | 네이버/카카오 별점 통합<br>및 핵심 키워드(#) 제공 | **Gemini Pro**를 활용한<br>고객 만족/불만 포인트 요약 | 여러 플랫폼의 리뷰를<br>한 화면에서 확인 |
