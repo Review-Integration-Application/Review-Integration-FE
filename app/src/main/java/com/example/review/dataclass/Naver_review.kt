@@ -1,8 +1,7 @@
 package com.example.review.dataclass
 
 data class Naver_review(
-    var rating: Float,
     var date: String,
     var content: String,
-    var imageUrls: List<String> = emptyList()
+    val imageUrls: List<String> = emptyList()
 )

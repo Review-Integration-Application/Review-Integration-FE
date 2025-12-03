@@ -1,0 +1,39 @@
+package com.example.review.api
+
+import com.example.review.api.Response.ImageResponse
+import com.example.review.api.Response.KakaoReviewResponse
+import com.example.review.api.Response.NaverReviewResponse
+import com.example.review.api.Response.RestaurantDetailResponse
+import retrofit2.Call
+import com.example.review.api.Response.RestaurantResponse
+import com.example.review.api.Response.ReviewSummaryResponse
+import retrofit2.http.GET
+import retrofit2.http.Path
+
+interface RestoreItf {
+
+    // 식당 전체 조회
+    @GET("restaurants")
+    fun getRestaurants(): Call<List<RestaurantResponse>>
+
+    // 식당 상세 조회
+    @GET("restaurant/{store_id}")
+    fun getRestaurant(@Path("store_id") storeId: Int): Call<RestaurantDetailResponse>
+
+    // 네이버 리뷰 조회
+    @GET("naver_review/{store_id}")
+    fun getNaverReview(@Path("store_id") storeId: Int): Call<List<NaverReviewResponse>>
+
+    // 카카오 리뷰 조회
+    @GET("kakao_review/{store_id}")
+    fun getKakaoReview(@Path("store_id") storeId: Int): Call<List<KakaoReviewResponse>>
+
+    // 리뷰 요약 조회
+    @GET("review_summary/{store_id}")
+    fun getReviewSummary(@Path("store_id") storeId: Int): Call<ReviewSummaryResponse>
+
+    // 리뷰 요약 긍정 or 부정 이미지 조회 API
+    @GET("restaurant_image/{store_id}")
+    fun getRestaurantImage(@Path("store_id") storeId: Int): Call<ImageResponse>
+
+}

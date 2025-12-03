@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-
+        android:name=".login.GlobalApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -21,8 +21,15 @@
         android:theme="@style/Theme.Review"
         tools:targetApi="31"
         tools:replace="android:label,android:icon">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="구글지도API키값" />
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="카카오네이티브키값" />
+
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,9 +37,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <meta-data
-            android:name="com.naver.maps.map.CLIENT_ID"
-            android:value="1nul4fzjii" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".login.LoginActivity"
+            android:exported="false"/>
+
+        <!-- 카카오 로그인, 인가코드를 받기 위한 액티비티 -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Redirect URI: "kakao${NATIVE_APP_KEY}://oauth" -->
+                <data android:host="oauth"
+                    android:scheme="카카오네이티브키값" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

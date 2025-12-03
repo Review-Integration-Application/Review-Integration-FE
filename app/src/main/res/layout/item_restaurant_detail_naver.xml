@@ -13,17 +13,17 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <!-- 별점 텍스트 (TextView로 별 아이콘 표시) -->
-        <TextView
-            android:id="@+id/starTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="★★★★☆"
-            android:textColor="#FFD700"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/textDate" />
+<!--        &lt;!&ndash; 별점 텍스트 (TextView로 별 아이콘 표시) &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/starTextView"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="★★★★☆"-->
+<!--            android:textColor="#FFD700"-->
+<!--            android:textSize="16sp"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="@id/textDate" />-->
 
         <!-- 날짜 -->
         <TextView
@@ -32,9 +32,9 @@
             android:layout_height="wrap_content"
             android:text="2025.02.12"
             android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/starTextView"
-            app:layout_constraintBottom_toBottomOf="@id/starTextView" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="parent" />
 
         <!-- 리뷰 내용 -->
         <TextView
@@ -43,35 +43,21 @@
             android:layout_height="wrap_content"
             android:text="담백하고 든든한 국밥이에요. 또 먹고 싶어요!"
             android:textSize="16sp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/starTextView"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- 이미지 (선택적으로 보임) -->
-        <LinearLayout
-            android:id="@+id/imageContainer"
-            android:layout_width="wrap_content"
+        <!-- 가변 이미지용 수평 RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/imageList"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp"
-            android:visibility="visible"
+            android:overScrollMode="never"
+            android:paddingTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/textReview"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <ImageView
-                android:id="@+id/image1"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginEnd="8dp"
-                android:scaleType="centerCrop" />
-
-            <ImageView
-                android:id="@+id/image2"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:scaleType="centerCrop" />
-        </LinearLayout>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
