@@ -23,10 +23,10 @@
         tools:replace="android:label,android:icon">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBzB1gQuvJptGpD6wcxEmsKA37O3tzExT4" />
+            android:value="구글지도API키값" />
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="2f54706174cb1cedb14367762b572bb0" />
+            android:value="카카오네이티브키값" />
 
         <activity
             android:name=".SplashActivity"
@@ -55,7 +55,7 @@
 
                 <!-- Redirect URI: "kakao${NATIVE_APP_KEY}://oauth" -->
                 <data android:host="oauth"
-                    android:scheme="kakao2f54706174cb1cedb14367762b572bb0" />
+                    android:scheme="카카오네이티브키값" />
             </intent-filter>
         </activity>
 

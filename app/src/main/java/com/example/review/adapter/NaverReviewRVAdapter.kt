@@ -7,10 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.review.databinding.ItemRestaurantDetailNaverBinding
 import com.example.review.dataclass.Naver_review
-import com.bumptech.glide.Glide
 
 class NaverReviewRVAdapter(
-    private val naverReviewList: MutableList<Naver_review>   // ★ ArrayList -> MutableList 로
+    private val naverReviewList: MutableList<Naver_review>
 ) : RecyclerView.Adapter<NaverReviewRVAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemRestaurantDetailNaverBinding)

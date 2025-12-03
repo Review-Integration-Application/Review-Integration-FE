@@ -7,15 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.review.RestaurantDetailNaverFragment.Companion
 import com.example.review.adapter.KakaoReviewRVAdapter
 import com.example.review.api.Response.KakaoReviewResponse
-import com.example.review.api.Response.NaverReviewResponse
 import com.example.review.api.RestoreItf
 import com.example.review.api.RetrofitBaseObj
 import com.example.review.databinding.FragmentRestaurantDetailKakaoBinding
 import com.example.review.dataclass.Kakao_review
-import com.example.review.dataclass.Naver_review
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -95,7 +92,7 @@ class RestaurantDetailKakaoFragment: Fragment() {
     private fun fetchKakaoReviews(storeId: Int) {
         val svc = RetrofitBaseObj.getRetrofit().create(RestoreItf::class.java)
 
-        // ★ 서버가 "리스트" 반환할 때
+        // 서버가 "리스트" 반환할 때
         svc.getKakaoReview(storeId).enqueue(object: Callback<List<KakaoReviewResponse>> {
             override fun onResponse(
                 call: Call<List<KakaoReviewResponse>>,

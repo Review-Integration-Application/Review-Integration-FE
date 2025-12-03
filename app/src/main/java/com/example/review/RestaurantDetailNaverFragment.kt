@@ -92,7 +92,7 @@ class RestaurantDetailNaverFragment: Fragment() {
     private fun fetchNaverReviews(storeId: Int) {
         val svc = RetrofitBaseObj.getRetrofit().create(RestoreItf::class.java)
 
-        // ★ 서버가 "리스트" 반환할 때
+        // 서버가 "리스트" 반환할 때
         svc.getNaverReview(storeId).enqueue(object: Callback<List<NaverReviewResponse>> {
             override fun onResponse(
                 call: Call<List<NaverReviewResponse>>,

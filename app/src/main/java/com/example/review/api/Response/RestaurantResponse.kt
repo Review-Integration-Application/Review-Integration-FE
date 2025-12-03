@@ -7,7 +7,7 @@ data class RestaurantResponse(
     //var restore_score: Double,
     var category: String,
     var address: String,
-    var img_urls: String?, // 이미지는 여러 개면 리스트로!
+    var img_urls: String?,
     var naver_review_num: Int,
     var kakao_review_num: Int,
     var total_review_num: Int,

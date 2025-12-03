@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName
 
 data class ReviewSummaryResponse(
     @SerializedName("naver_hashtag")
-    var naver_hashtag: String?, // "#태그1 #태그2" 형태의 문자열로 예상
+    var naver_hashtag: String?,
 
     @SerializedName("kakao_hashtag")
-    var kakao_hashtag: String?, // "#태그1 #태그2" 형태의 문자열로 예상
+    var kakao_hashtag: String?,
 
     @SerializedName("good_points")
     var good_points: String?,

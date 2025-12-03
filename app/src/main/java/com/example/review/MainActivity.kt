@@ -45,11 +45,9 @@ class MainActivity : AppCompatActivity() {
 
     private val addressCache = mutableMapOf<String, LatLng>()
 
-    // ▼▼▼▼▼ 새로 추가된 프로퍼티 ▼▼▼▼▼
     private lateinit var restaurantListAdapter: RestaurantListAdapter
     private var restaurantList = listOf<RestaurantResponse>()
     private val markerRestaurantMap = mutableMapOf<Marker, RestaurantResponse>()
-    // ▲▲▲▲▲ 새로 추가된 프로퍼티 ▲▲▲▲▲
 
     lateinit var binding: ActivityMainBinding
     private lateinit var mainGoogleMap: GoogleMap
@@ -62,10 +60,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ▼▼▼▼▼ 새로 추가된 함수 호출 ▼▼▼▼▼
         setupDrawer()
         setupRecyclerView()
-        // ▲▲▲▲▲ 새로 추가된 함수 호출 ▲▲▲▲▲
 
         // 프래그먼트 백스택 변경 감지
         supportFragmentManager.addOnBackStackChangedListener {
@@ -113,17 +109,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ▼▼▼▼▼ Drawer 설정 함수 (신규) ▼▼▼▼▼
+    // Drawer 설정 함수
     private fun setupDrawer() {
         binding.menuButtonIv.setOnClickListener {
             binding.drawerLayout.openDrawer(GravityCompat.START)
         }
     }
-    // ▲▲▲▲▲ Drawer 설정 함수 (신규) ▲▲▲▲▲
 
-    // ▼▼▼▼▼ RecyclerView 설정 함수 (신규) ▼▼▼▼▼
+    // RecyclerView 설정 함수
     private fun setupRecyclerView() {
         restaurantListAdapter = RestaurantListAdapter { restaurant ->
+
             // 리스트 아이템 클릭 시 실행될 코드
             binding.drawerLayout.closeDrawer(GravityCompat.START)
 
@@ -141,10 +137,8 @@ class MainActivity : AppCompatActivity() {
             adapter = restaurantListAdapter
         }
     }
-    // ▲▲▲▲▲ RecyclerView 설정 함수 (신규) ▲▲▲▲▲
 
-
-    // ▼▼▼▼▼ API 호출 및 마커 생성 로직 (분리된 함수) ▼▼▼▼▼
+    // API 호출 및 마커 생성 로직
     private fun fetchAndDisplayRestaurants(map: GoogleMap) {
         val restoreService = RetrofitBaseObj.getRetrofit().create(RestoreItf::class.java)
         restoreService.getRestaurants().enqueue(object : Callback<List<RestaurantResponse>> {
@@ -189,10 +183,8 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
-    // ▲▲▲▲▲ API 호출 및 마커 생성 로직 (분리된 함수) ▲▲▲▲▲
 
-
-    // ▼▼▼▼▼ 바텀시트 표시 함수 (분리된 함수) ▼▼▼▼▼
+    // 바텀시트 표시 함수
     private fun showBottomSheetForRestaurant(restaurant: RestaurantResponse) {
         selectedRestaurant = restaurant
         binding.tvRestaurantName.text = restaurant.store_name
@@ -211,10 +203,8 @@ class MainActivity : AppCompatActivity() {
         }
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
-    // ▲▲▲▲▲ 바텀시트 표시 함수 (분리된 함수) ▲▲▲▲▲
 
-
-    // ▼▼▼▼▼ 아래는 기존과 동일한 유틸리티 함수들 ▼▼▼▼▼
+    // 아래는 기존과 동일한 유틸리티 함수들
     private fun createMarkerIconWithText(context: Context, storeName: String): BitmapDescriptor {
         val markerView = (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
             .inflate(R.layout.marker_layout, null)

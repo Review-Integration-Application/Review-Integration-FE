@@ -48,7 +48,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- ✅ 가변 이미지용 수평 RecyclerView -->
+        <!-- 가변 이미지용 수평 RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/imageList"
             android:layout_width="0dp"

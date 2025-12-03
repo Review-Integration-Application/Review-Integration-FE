@@ -38,7 +38,7 @@ class LoginActivity: AppCompatActivity() {
         setContentView(binding.root)
 
         val keyHash = Utility.getKeyHash(this)
-        Log.d("Hash", keyHash) //Lzp54IEXWVlhk4LWP3w0CVSSxsA=
+        Log.d("Hash", keyHash)
 
         binding.kakaoLoginIv.setOnClickListener {
 

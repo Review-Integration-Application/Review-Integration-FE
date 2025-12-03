@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.review.databinding.ItemRestaurantDetailKakaoBinding
 import com.example.review.dataclass.Kakao_review
-import com.example.review.dataclass.Naver_review
 
 class KakaoReviewRVAdapter(
     private val kakaoReviewList: MutableList<Kakao_review>

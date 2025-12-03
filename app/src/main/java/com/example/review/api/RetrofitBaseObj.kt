@@ -8,9 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitBaseObj { // Retrofit 객체 생성
 
     // base url
-    // 우리집 192.168.200.195
-    // 교회 192.168.45.7
-    private const val BASE_URL = "http://192.168.200.195:8000/"
+    private const val BASE_URL = "http://내ip주소:8000/"
 
     fun getRetrofit(): Retrofit {
 
