@@ -49,14 +49,6 @@
 
 ---
 
-## 📷 스크린샷 (Screenshots)
-
-### 1. 메인 기능 (Main Features)
-| 로그인 화면 | 지도 및 검색 | 식당 리스트 |
-| :---: | :---: | :---: |
-| <img src="images/login.jpg" width="250"/> | <img src="images/map_view.jpg" width="250"/> | <img src="images/restaurant_list.jpg" width="250"/> |
-| 카카오톡 소셜 로그인으로<br>간편하게 시작 | 내 주변 맛집 탐색 및<br>핀(Pin) 확인 | 지도 기반 식당 목록<br>빠른 확인 |
-
 ### 2. AI 상세 요약 및 리뷰 (AI Summary & Integration)
 | 통합 정보 & 태그 | AI 장단점 요약 | 플랫폼별 리뷰 통합 |
 | :---: | :---: | :---: |
